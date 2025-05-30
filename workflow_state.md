@@ -4,8 +4,8 @@
 - **Phase**: DEVELOP
 - **Status**: IN_PROGRESS  
 - **Current Task**: Milestone 1 - Core Infrastructure
-- **Current Step**: Checkpoint 1.3 - Transparent Overlay Window System
-- **Current Item**: Creating transparent NSWindow for overlay functionality
+- **Current Step**: Checkpoint 1.4 - Global Hotkey System
+- **Current Item**: Implementing system-wide keyboard shortcuts for overlay toggle
 
 ## Progress Summary
 
@@ -44,22 +44,38 @@
 - `Tests/ScreenCaptureManagerTests.swift` - Comprehensive test coverage
 - Enhanced `Sources/Magnify/App/AppDelegate.swift` - Screen capture integration and test UI
 
+#### Checkpoint 1.3: Transparent Overlay Window System (COMPLETED)
+- ✅ Created OverlayWindow class with transparent, borderless configuration
+- ✅ Implemented OverlayContentView with real-time drawing capabilities
+- ✅ Configured window to display on all Spaces (.canJoinAllSpaces, .stationary)
+- ✅ Set up .statusBar window level for top-most display
+- ✅ Added complete mouse event handling (mouseDown/mouseDragged/mouseUp)
+- ✅ Implemented configurable stroke color and width for drawing
+- ✅ Created comprehensive test suite (OverlayWindowTests.swift)
+- ✅ Enhanced AppDelegate with overlay window test UI
+- ✅ Added show/hide/clear drawing functionality
+
+**Key Files Created:**
+- `Sources/Magnify/Views/OverlayWindow.swift` - Complete overlay window implementation
+- `Tests/OverlayWindowTests.swift` - Comprehensive test coverage
+- Enhanced `Sources/Magnify/App/AppDelegate.swift` - Overlay window integration and test UI
+
 ### 🚧 Current Checkpoint
 
-#### Checkpoint 1.3: Transparent Overlay Window System (IN_PROGRESS)
+#### Checkpoint 1.4: Global Hotkey System (IN_PROGRESS)
 **Objectives:**
-- Create transparent overlay NSWindow for system-wide annotations
-- Implement borderless, transparent window with proper level management
-- Set up window to display on all Spaces and remain on top
-- Add basic mouse event handling for overlay interaction
-- Test overlay window behavior across different scenarios
+- Implement system-wide keyboard shortcuts for overlay toggle
+- Create HotkeyManager class for global event handling
+- Add support for customizable hotkey combinations
+- Ensure App Sandbox compatibility
+- Test hotkey functionality across different system states
 
 **Next Steps:**
-1. Create OverlayWindow class extending NSWindow
-2. Implement OverlayContentView for drawing surface
-3. Configure window properties (transparent, borderless, top-level)
-4. Add cross-Space display functionality
-5. Test mouse event handling and window management
+1. Create HotkeyManager class using Carbon Event Manager
+2. Implement global event tap with proper permissions
+3. Add hotkey registration and unregistration
+4. Integrate with OverlayWindow for toggle functionality
+5. Test system-wide hotkey behavior
 
 ## Embedded Rules
 
@@ -77,14 +93,14 @@
 
 ## Active Plan
 
-**Current Focus**: Implementing transparent overlay window system for screen-wide annotations. This creates the foundation for all drawing and annotation features that will be built in subsequent checkpoints.
+**Current Focus**: Implementing global hotkey system for system-wide overlay toggle functionality. This enables users to quickly show/hide the annotation overlay from anywhere in the system.
 
-**Success Criteria for Checkpoint 1.3**:
-- OverlayWindow class with transparent, borderless configuration
-- Window displays on all Spaces and stays on top of other applications
-- OverlayContentView handles mouse events for future drawing functionality
-- Window can be shown/hidden programmatically
-- Proper integration with existing AppDelegate and screen capture system
+**Success Criteria for Checkpoint 1.4**:
+- HotkeyManager class with global event tap functionality
+- System-wide keyboard shortcut registration (e.g., Cmd+Shift+M)
+- App Sandbox compatible implementation
+- Integration with OverlayWindow for toggle functionality
+- Proper hotkey conflict detection and error handling
 
 ## Operational Log
 
@@ -109,7 +125,13 @@
 - **Resume Work**: 📋 Reviewed project status and confirmed Checkpoint 1.2 completion
 - **Status Update**: 📝 Updated workflow_state.md to reflect current progress
 - **Swift Build Issue**: ⚠️ Identified Command Line Tools vs Swift 6.1 version mismatch (non-blocking)
-- **Next Phase**: 🚧 **Starting Checkpoint 1.3** - Transparent Overlay Window System
+- **Started Checkpoint 1.3**: 🚧 Transparent Overlay Window System implementation
+- **OverlayWindow Implementation**: ✅ Complete transparent NSWindow with borderless configuration
+- **OverlayContentView Creation**: ✅ Real-time drawing with NSBezierPath and mouse events
+- **Test Suite Development**: ✅ Comprehensive OverlayWindowTests.swift with full coverage
+- **AppDelegate Integration**: ✅ Enhanced UI with overlay window test functionality
+- **17:30**: ✅ **Checkpoint 1.3 COMPLETED** - Transparent Overlay Window System complete
+- **Next Phase**: 🚧 **Starting Checkpoint 1.4** - Global Hotkey System
 
 # workflow_state.md
 

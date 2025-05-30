@@ -66,6 +66,56 @@ All blog posts use the format: `YYYY-MM-DD-checkpoint-title.md`
 - **2025-06-05:** Checkpoint 1.4 Completion (Estimated)  
 - **2025-06-08:** Milestone 1 Complete (Estimated)
 
+### 🤖 GitHub CLI Automation Setup
+
+**Automated PR Creation Workflow:**
+```bash
+# Method 1: SSH Key Authentication (Recommended - using existing SSH keys)
+gh auth login --git-protocol ssh --web  # One-time setup
+./.github/scripts/create-checkpoint-pr.sh 1.2 "ScreenCaptureKit Implementation"
+
+# Method 2: Environment Variable (Alternative for CI/CD)
+export GITHUB_TOKEN="your_github_token_here"
+./.github/scripts/create-checkpoint-pr.sh 1.2 "ScreenCaptureKit Implementation"
+
+# Method 3: One-time Token Authentication
+echo "your_github_token_here" | gh auth login --with-token
+./.github/scripts/create-checkpoint-pr.sh 1.2
+
+# Method 4: Interactive Setup (Automated script)
+./.github/scripts/setup-gh-auth.sh
+```
+
+**SSH Key Authentication Setup (Recommended):**
+1. Ensure SSH key is working: `ssh -T git@github.com`
+2. Run: `gh auth login --git-protocol ssh --web`
+3. Choose your preferred SSH key (id_ed25519.pub recommended)
+4. Complete web browser authentication
+5. Test: `gh auth status`
+
+**GitHub Personal Access Token Setup:**
+1. Go to GitHub.com → Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Generate new token with scopes: `repo`, `workflow`, `admin:public_key`
+3. Save token securely and use in automation scripts
+
+**Automation Scripts:**
+- `.github/scripts/setup-gh-auth.sh` - Automated authentication setup
+- `.github/scripts/create-checkpoint-pr.sh` - Automated PR creation
+- Both scripts support multiple authentication methods
+
+**Checkpoint Workflow Commands:**
+```bash
+# 1. Create feature branch
+git checkout -b feature/checkpoint-X-Y-name
+
+# 2. Implement changes and commit
+git add . && git commit -m "✅ Checkpoint X.Y: Description"
+
+# 3. Push and create PR (automated)
+git push origin feature/checkpoint-X-Y-name
+./.github/scripts/create-checkpoint-pr.sh X.Y "Title" "Description"
+```
+
 ## GitHub Workflow Strategy
 ### Repository Structure:
 ```
@@ -352,7 +402,7 @@ gh pr create --title "🎉 Milestone N Complete" --body "All checkpoints N.1~N.4
 - [ ] Privacy policy writing
 - [ ] Marketing materials completion
 
-**📝 Document Update:**
+**�� Document Update:**
 - **File:** `/docs/progress/checkpoint-4-4.html`
 - **Title:** "App Store Metadata and Marketing Materials"
 - **Deploy:** Immediately upon checkpoint completion

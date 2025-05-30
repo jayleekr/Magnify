@@ -1,149 +1,149 @@
 ---
 layout: post
-title: "🚀 Magnify 프로젝트 시작 - ZoomIt 대안 macOS 앱 개발 여정의 첫걸음"
+title: "🚀 Magnify Project Launch - First Steps in Building a ZoomIt Alternative macOS App"
 date: 2025-05-30 09:00:00 +0900
-category: "프로젝트 기획"
-description: "Windows ZoomIt과 동등한 기능을 제공하는 macOS 네이티브 화면 주석 도구를 Swift로 개발하여 Mac App Store에 출시하고 수익화하는 프로젝트의 시작"
-tags: [프로젝트시작, macOS, Swift, ZoomIt, 앱개발]
+category: "Project Planning"
+description: "Starting the development project to create a macOS native screen annotation tool that provides equivalent functionality to Windows ZoomIt, developed in Swift for Mac App Store release and monetization"
+tags: [project-launch, macOS, Swift, ZoomIt, app-development]
 milestone: 1
 checkpoint: 1
 author: "Jay Lee"
 ---
 
-## 🔍 프로젝트 탄생 배경
+## 🔍 Project Genesis
 
-macOS에서 프레젠테이션이나 강의를 할 때 화면을 확대하거나 주석을 그려야 하는 경우가 종종 있습니다. Windows에서는 Microsoft의 **ZoomIt**이라는 훌륭한 도구가 있지만, macOS에는 이와 동등한 수준의 네이티브 앱이 부족한 상황입니다.
+When presenting or teaching on macOS, there are frequent occasions where we need to magnify parts of the screen or draw annotations for explanation. While Windows has an excellent tool called **ZoomIt** by Microsoft, macOS lacks native apps of equivalent quality.
 
-이 프로젝트는 다음과 같은 필요에서 시작되었습니다:
+This project was born from the following needs:
 
-- **프레젠테이션 효율성:** 화면의 특정 부분을 확대해서 보여주고 싶을 때
-- **실시간 주석:** 화면에 직접 그림을 그려서 설명하고 싶을 때
-- **시간 관리:** 프레젠테이션 시간을 체크하고 싶을 때
-- **macOS 네이티브 경험:** macOS의 성능과 사용성을 최대한 활용하고 싶을 때
+- **Presentation Efficiency:** When you want to magnify specific parts of the screen
+- **Real-time Annotation:** When you want to draw directly on the screen for explanation
+- **Time Management:** When you want to track presentation time
+- **macOS Native Experience:** When you want to maximize macOS performance and usability
 
-## 📋 프로젝트 준비 과정
+## 📋 Project Preparation Process
 
-실제 개발에 들어가기 전에 충분한 계획과 준비가 필요했습니다. 지난 며칠간 다음과 같은 준비 작업을 진행했습니다:
+Before diving into actual development, thorough planning and preparation were necessary. Over the past few days, the following preparatory work was completed:
 
-### 1. ZoomIt 기능 분석
-Windows ZoomIt의 모든 기능을 분석하고 macOS 환경에서 구현 가능한 기능들을 정리했습니다.
+### 1. ZoomIt Feature Analysis
+Analyzed all features of Windows ZoomIt and documented features implementable in the macOS environment.
 
-### 2. macOS 개발 가이드 연구
-macOS 앱 개발을 위한 기술 스택, 제약사항, App Store 배포 전략을 상세히 조사했습니다.
+### 2. macOS Development Guide Research
+Conducted detailed research on technology stacks, constraints, and App Store deployment strategies for macOS app development.
 
-### 3. 기술 스택 선정
-Swift + AppKit + ScreenCaptureKit 조합으로 최적의 성능과 사용자 경험을 제공하기로 결정했습니다.
+### 3. Technology Stack Selection
+Decided on the Swift + AppKit + ScreenCaptureKit combination to provide optimal performance and user experience.
 
-### 4. 프로젝트 구조 설계
-5개 마일스톤, 20개 체크포인트로 구성된 상세한 개발 계획을 수립했습니다.
+### 4. Project Structure Design
+Established a detailed development plan consisting of 5 milestones and 20 checkpoints.
 
-### 5. GitHub 저장소 및 Pages 설정
-버전 관리와 개발 과정 문서화를 위한 인프라를 구축했습니다.
+### 5. GitHub Repository and Pages Setup
+Built infrastructure for version control and development process documentation.
 
-## 🛠️ 기술 스택 선정
+## 🛠️ Technology Stack Selection
 
-macOS 네이티브 앱으로서 최고의 성능과 사용자 경험을 제공하기 위해 다음과 같은 기술 스택을 선정했습니다:
+To provide the best performance and user experience as a macOS native app, the following technology stack was selected:
 
-| 기술 | 용도 | 선정 이유 |
-|------|------|-----------|
-| **Swift 5.9+** | 주 개발 언어 | 최신 Swift 기능을 활용하여 안전하고 효율적인 코드 작성 |
-| **AppKit** | UI 프레임워크 | macOS 네이티브 UI, 투명 오버레이와 복잡한 윈도우 관리 |
-| **ScreenCaptureKit** | 화면 캡처 | macOS 12.3+의 최신 화면 캡처 API, 높은 성능과 보안 |
-| **Metal** | GPU 가속 | 실시간 화면 확대/축소 처리로 부드러운 사용자 경험 |
-| **Carbon** | 전역 단축키 | RegisterEventHotKey를 통한 App Sandbox 환경 지원 |
-| **SwiftUI** | 설정 UI | 현대적이고 직관적인 설정 인터페이스 |
+| Technology | Purpose | Selection Reason |
+|------------|---------|------------------|
+| **Swift 5.9+** | Main development language | Write safe and efficient code using latest Swift features |
+| **AppKit** | UI framework | macOS native UI, transparent overlays and complex window management |
+| **ScreenCaptureKit** | Screen capture | Latest screen capture API for macOS 12.3+, high performance and security |
+| **Metal** | GPU acceleration | Real-time screen magnification/zoom processing for smooth user experience |
+| **Carbon** | Global hotkeys | Support for App Sandbox environment through RegisterEventHotKey |
+| **SwiftUI** | Settings UI | Modern and intuitive settings interface |
 
-## 📅 개발 계획
+## 📅 Development Plan
 
-총 9주(56일)에 걸쳐 5개의 주요 마일스톤으로 나누어 개발을 진행할 예정입니다:
+Development will proceed over 9 weeks (56 days) divided into 5 major milestones:
 
 ### Milestone 1: Core Infrastructure (Week 1-2)
-- ✅ Checkpoint 1.1: Xcode 프로젝트 설정 및 App Sandbox 구성
-- ⏳ Checkpoint 1.2: ScreenCaptureKit 권한 및 기본 화면 캡처
-- ⏳ Checkpoint 1.3: 투명 오버레이 NSWindow 시스템
-- ⏳ Checkpoint 1.4: 단위 테스트 및 GitHub Actions CI/CD
+- ✅ Checkpoint 1.1: Xcode project setup and App Sandbox configuration
+- ⏳ Checkpoint 1.2: ScreenCaptureKit permissions and basic screen capture
+- ⏳ Checkpoint 1.3: Transparent overlay NSWindow system
+- ⏳ Checkpoint 1.4: Unit testing and GitHub Actions CI/CD
 
 ### Milestone 2: Zoom & Annotation Core (Week 3-4)
-- ⏳ Checkpoint 2.1: 실시간 화면 확대/축소 엔진
-- ⏳ Checkpoint 2.2: NSBezierPath 기반 펜 그리기 시스템
-- ⏳ Checkpoint 2.3: Carbon RegisterEventHotKey 전역 단축키
-- ⏳ Checkpoint 2.4: 기본 사용자 인터페이스
+- ⏳ Checkpoint 2.1: Real-time screen magnification/zoom engine
+- ⏳ Checkpoint 2.2: NSBezierPath-based pen drawing system
+- ⏳ Checkpoint 2.3: Carbon RegisterEventHotKey global shortcuts
+- ⏳ Checkpoint 2.4: Basic user interface
 
 ### Milestone 3: Advanced Features (Week 5-6)
-- ⏳ Checkpoint 3.1: NSTextField 텍스트 주석 시스템
-- ⏳ Checkpoint 3.2: 프레젠테이션 타이머 및 알람
-- ⏳ Checkpoint 3.3: SwiftUI 하이브리드 설정 UI
-- ⏳ Checkpoint 3.4: 다양한 펜 도구와 색상 시스템
+- ⏳ Checkpoint 3.1: NSTextField text annotation system
+- ⏳ Checkpoint 3.2: Presentation timer and alarm
+- ⏳ Checkpoint 3.3: SwiftUI hybrid settings UI
+- ⏳ Checkpoint 3.4: Various pen tools and color system
 
 ### Milestone 4: Polish & Testing (Week 7-8)
-- ⏳ Checkpoint 4.1: 성능 최적화 (메모리 <50MB, 응답 <100ms)
-- ⏳ Checkpoint 4.2: 포괄적 테스팅 (XCTest, XCUITest)
-- ⏳ Checkpoint 4.3: TestFlight 베타 테스팅
-- ⏳ Checkpoint 4.4: App Store 메타데이터 및 마케팅 자료
+- ⏳ Checkpoint 4.1: Performance optimization (Memory <50MB, Response <100ms)
+- ⏳ Checkpoint 4.2: Comprehensive testing (XCTest, XCUITest)
+- ⏳ Checkpoint 4.3: TestFlight beta testing
+- ⏳ Checkpoint 4.4: App Store metadata and marketing materials
 
 ### Milestone 5: App Store Launch (Week 9)
-- ⏳ Checkpoint 5.1: Apple Distribution 코드 서명
-- ⏳ Checkpoint 5.2: App Store Connect 업로드
-- ⏳ Checkpoint 5.3: Apple 심사 대응
-- ⏳ Checkpoint 5.4: 공식 출시 및 마케팅
+- ⏳ Checkpoint 5.1: Apple Distribution code signing
+- ⏳ Checkpoint 5.2: App Store Connect upload
+- ⏳ Checkpoint 5.3: Apple review response
+- ⏳ Checkpoint 5.4: Official launch and marketing
 
-## 🎯 핵심 기능 설계
+## 🎯 Core Feature Design
 
-Magnify는 다음과 같은 핵심 기능들을 제공할 예정입니다:
+Magnify will provide the following core features:
 
-> **🔍 실시간 화면 확대/축소:** 마우스 위치를 중심으로 부드러운 확대/축소를 제공하며, Metal GPU 가속을 통해 100ms 이하의 응답 시간을 목표로 합니다.
+> **🔍 Real-time Screen Magnification:** Provides smooth magnification/zoom centered on mouse position, targeting response times under 100ms through Metal GPU acceleration.
 
-> **✏️ 실시간 주석 그리기:** NSBezierPath를 활용한 부드러운 펜 그리기와 다양한 색상, 굵기 옵션을 제공합니다.
+> **✏️ Real-time Annotation Drawing:** Provides smooth pen drawing using NSBezierPath with various color and thickness options.
 
-> **📝 텍스트 주석:** 화면 위 임의의 위치에 텍스트를 추가하고 편집할 수 있는 기능을 제공합니다.
+> **📝 Text Annotations:** Ability to add and edit text at any position on the screen.
 
-> **⏱️ 프레젠테이션 타이머:** 카운트다운/카운트업 타이머와 시각적 알람으로 시간 관리를 돕습니다.
+> **⏱️ Presentation Timer:** Countdown/count-up timer and visual alarms to help with time management.
 
-> **⌨️ 전역 단축키:** App Sandbox 환경에서도 동작하는 전역 단축키로 어떤 앱에서든 빠르게 기능을 활성화할 수 있습니다.
+> **⌨️ Global Hotkeys:** Global shortcuts that work in App Sandbox environment, allowing quick feature activation from any app.
 
-## 📊 성능 목표
+## 📊 Performance Goals
 
-사용자 경험을 위해 다음과 같은 성능 목표를 설정했습니다:
+The following performance targets were set for user experience:
 
 ```
-줌 응답시간: <100ms
-메모리 사용량: <50MB
-CPU 사용률: 실시간 그리기 중 <30%
-크래시율: <0.1%
-테스트 커버리지: 80%+
+Zoom Response Time: <100ms
+Memory Usage: <50MB
+CPU Usage: <30% during real-time drawing
+Crash Rate: <0.1%
+Test Coverage: 80%+
 ```
 
-## 🚀 개발 방법론
+## 🚀 Development Methodology
 
-이 프로젝트는 다음과 같은 개발 방법론을 적용합니다:
+This project applies the following development methodologies:
 
-### 체크포인트 기반 개발
-각 마일스톤을 4개의 체크포인트로 나누어, 2-3일마다 구체적인 성과물을 완성하고 문서화합니다.
+### Checkpoint-Based Development
+Each milestone is divided into 4 checkpoints, completing and documenting specific deliverables every 2-3 days.
 
-### 지속적 문서화
-모든 체크포인트 완료 시마다 GitHub Pages에 개발 과정, 도전과제, 해결책을 상세히 기록합니다.
+### Continuous Documentation
+Upon completion of each checkpoint, detailed records of the development process, challenges, and solutions are documented on GitHub Pages.
 
-### AI 기반 개발 가속화
-각 마일스톤별로 상세한 AI 개발 프롬프트를 준비하여 효율적인 개발을 진행합니다.
+### AI-Accelerated Development
+Detailed AI development prompts are prepared for each milestone to enable efficient development.
 
-### GitHub 기반 협업
-모든 코드는 GitHub에서 관리되며, Actions를 통한 자동 빌드/테스트/배포를 구현합니다.
+### GitHub-Based Collaboration
+All code is managed on GitHub, with automated build/test/deploy implemented through Actions.
 
-## 💰 수익화 전략
+## 💰 Monetization Strategy
 
-앱의 지속 가능한 개발을 위해 단계적 수익화 전략을 수립했습니다:
+A phased monetization strategy was established for sustainable app development:
 
-- **Phase 1 (출시 직후):** 무료 배포로 사용자 확보 및 피드백 수집
-- **Phase 2 (3개월 후):** 프리미엄 기능에 대한 인앱 구매 ($2.99-$4.99) 추가
-- **Phase 3 (6개월 후):** 신규 사용자에게 유료 앱 ($9.99-$14.99) 전환
+- **Phase 1 (Post-launch):** Free distribution to acquire users and collect feedback
+- **Phase 2 (3 months later):** Add in-app purchases for premium features ($2.99-$4.99)
+- **Phase 3 (6 months later):** Transition to paid app for new users ($9.99-$14.99)
 
-## 🔮 다음 단계
+## 🔮 Next Steps
 
-이제 모든 준비가 완료되었습니다! 다음 포스트에서는 첫 번째 체크포인트인 **"Xcode 프로젝트 설정과 App Sandbox 구성"** 과정을 상세히 다룰 예정입니다.
+All preparations are now complete! The next post will cover the first checkpoint: **"Xcode Project Setup and App Sandbox Configuration"** in detail.
 
-앞으로 9주간의 개발 여정이 기대됩니다. ZoomIt을 뛰어넘는 macOS 최고의 화면 주석 도구를 만들어보겠습니다! 🚀
+Looking forward to the 9-week development journey ahead. Let's build the best screen annotation tool for macOS that surpasses ZoomIt! 🚀
 
 ---
 
-**📍 현재 진행상황:** 프로젝트 기획 완료, GitHub Pages 설정 완료  
-**⏭️ 다음 체크포인트:** Checkpoint 1.1 - Xcode 프로젝트 설정 (Day 1-2) 
+**📍 Current Progress:** Project planning completed, GitHub Pages setup completed  
+**⏭️ Next Checkpoint:** Checkpoint 1.1 - Xcode Project Setup (Day 1-2) 

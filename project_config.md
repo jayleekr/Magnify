@@ -32,6 +32,90 @@
   - **GitHub Actions** - automated build, test, GitHub Pages deployment
   - **GitHub CLI (gh)** - PR creation, workflow status check, release management
 
+## Development Timeline 
+
+### 🗓️ Project Schedule (May 30, 2025 Start)
+**Project Start Date:** May 30, 2025  
+**Total Development Period:** 9 weeks (63 days)
+
+| Milestone | Duration | Start Date | End Date | Status |
+|-----------|----------|------------|----------|---------|
+| **Milestone 1: Core Infrastructure** | 2 weeks | 2025-05-30 | 2025-06-13 | 🚧 In Progress |
+| **Milestone 2: Zoom & Annotation** | 2 weeks | 2025-06-14 | 2025-06-27 | ⏳ Pending |
+| **Milestone 3: Advanced Features** | 2 weeks | 2025-06-28 | 2025-07-11 | ⏳ Pending |
+| **Milestone 4: Polish & Testing** | 2 weeks | 2025-07-12 | 2025-07-25 | ⏳ Pending |
+| **Milestone 5: App Store Launch** | 1 week | 2025-07-26 | 2025-08-01 | ⏳ Pending |
+
+### 📅 Current Status
+- **Current Date:** May 30, 2025
+- **Active Milestone:** Milestone 1 (Core Infrastructure)  
+- **Active Checkpoint:** 1.3 (Transparent Overlay Window System)
+- **Progress:** 50% of Milestone 1 completed
+
+### 🎯 Checkpoint Schedule (Milestone 1)
+- **Checkpoint 1.1:** Xcode Project Setup ✅ (COMPLETED - May 30, 2025)
+- **Checkpoint 1.2:** ScreenCaptureKit Implementation ✅ (COMPLETED - May 30, 2025)
+- **Checkpoint 1.3:** Transparent Overlay Window System 🚧 (IN PROGRESS)
+- **Checkpoint 1.4:** Global Hotkey Implementation ⏳ (Pending)
+
+### 📝 Blog Post Timeline
+All blog posts use the format: `YYYY-MM-DD-checkpoint-title.md`
+- **2025-05-30:** Project Kickoff & Checkpoint 1.1 Completion
+- **2025-05-30:** Checkpoint 1.2 Completion (ScreenCaptureKit Implementation)
+- **2025-06-02:** Checkpoint 1.3 Completion (Estimated)
+- **2025-06-05:** Checkpoint 1.4 Completion (Estimated)  
+- **2025-06-08:** Milestone 1 Complete (Estimated)
+
+### 🤖 GitHub CLI Automation Setup
+
+**Automated PR Creation Workflow:**
+```bash
+# Method 1: SSH Key Authentication (Recommended - using existing SSH keys)
+gh auth login --git-protocol ssh --web  # One-time setup
+./.github/scripts/create-checkpoint-pr.sh 1.2 "ScreenCaptureKit Implementation"
+
+# Method 2: Environment Variable (Alternative for CI/CD)
+export GITHUB_TOKEN="your_github_token_here"
+./.github/scripts/create-checkpoint-pr.sh 1.2 "ScreenCaptureKit Implementation"
+
+# Method 3: One-time Token Authentication
+echo "your_github_token_here" | gh auth login --with-token
+./.github/scripts/create-checkpoint-pr.sh 1.2
+
+# Method 4: Interactive Setup (Automated script)
+./.github/scripts/setup-gh-auth.sh
+```
+
+**SSH Key Authentication Setup (Recommended):**
+1. Ensure SSH key is working: `ssh -T git@github.com`
+2. Run: `gh auth login --git-protocol ssh --web`
+3. Choose your preferred SSH key (id_ed25519.pub recommended)
+4. Complete web browser authentication
+5. Test: `gh auth status`
+
+**GitHub Personal Access Token Setup:**
+1. Go to GitHub.com → Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Generate new token with scopes: `repo`, `workflow`, `admin:public_key`
+3. Save token securely and use in automation scripts
+
+**Automation Scripts:**
+- `.github/scripts/setup-gh-auth.sh` - Automated authentication setup
+- `.github/scripts/create-checkpoint-pr.sh` - Automated PR creation
+- Both scripts support multiple authentication methods
+
+**Checkpoint Workflow Commands:**
+```bash
+# 1. Create feature branch
+git checkout -b feature/checkpoint-X-Y-name
+
+# 2. Implement changes and commit
+git add . && git commit -m "✅ Checkpoint X.Y: Description"
+
+# 3. Push and create PR (automated)
+git push origin feature/checkpoint-X-Y-name
+./.github/scripts/create-checkpoint-pr.sh X.Y "Title" "Description"
+```
+
 ## GitHub Workflow Strategy
 ### Repository Structure:
 ```
@@ -318,7 +402,7 @@ gh pr create --title "🎉 Milestone N Complete" --body "All checkpoints N.1~N.4
 - [ ] Privacy policy writing
 - [ ] Marketing materials completion
 
-**📝 Document Update:**
+**�� Document Update:**
 - **File:** `/docs/progress/checkpoint-4-4.html`
 - **Title:** "App Store Metadata and Marketing Materials"
 - **Deploy:** Immediately upon checkpoint completion

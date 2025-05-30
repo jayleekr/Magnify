@@ -1,27 +1,27 @@
 ---
 layout: default
-title: "개발 블로그"
-description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로그"
+title: "Development Blog"
+description: "Blog documenting the step-by-step development process of the Magnify macOS app"
 ---
 
 <div class="blog-page">
     <section class="blog-header">
         <div class="container">
-            <h1 class="page-title">📝 개발 블로그</h1>
-            <p class="page-description">Magnify macOS 앱 개발 과정을 단계별로 기록한 블로그입니다.</p>
+            <h1 class="page-title">📝 Development Blog</h1>
+            <p class="page-description">Blog documenting the step-by-step development process of the Magnify macOS app.</p>
             
             <div class="blog-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ site.posts.size }}</span>
-                    <span class="stat-label">총 포스트</span>
+                    <span class="stat-label">Total Posts</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ site.progress.current_milestone }}</span>
-                    <span class="stat-label">현재 마일스톤</span>
+                    <span class="stat-label">Current Milestone</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ site.progress.current_checkpoint }}</span>
-                    <span class="stat-label">현재 체크포인트</span>
+                    <span class="stat-label">Current Checkpoint</span>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@ description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로�
                             
                             <div class="post-card-meta">
                                 <time datetime="{{ post.date | date_to_xmlschema }}">
-                                    {{ post.date | date: "%Y년 %m월 %d일" }}
+                                    {{ post.date | date: "%B %d, %Y" }}
                                 </time>
                                 
                                 {% if post.category %}
@@ -75,7 +75,7 @@ description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로�
                         
                         <div class="post-card-footer">
                             <a href="{{ post.url | relative_url }}" class="read-more-btn">
-                                자세히 읽기 <span class="arrow">→</span>
+                                Read More <span class="arrow">→</span>
                             </a>
                             
                             <div class="post-progress">
@@ -90,17 +90,17 @@ description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로�
                 {% if site.posts.size == 0 %}
                     <div class="no-posts">
                         <div class="no-posts-icon">📝</div>
-                        <h3>아직 포스트가 없습니다</h3>
-                        <p>곧 첫 번째 개발 포스트가 올라올 예정입니다!</p>
-                        <a href="{{ '/' | relative_url }}" class="btn btn-primary">홈으로 돌아가기</a>
+                        <h3>No posts yet</h3>
+                        <p>The first development post will be published soon!</p>
+                        <a href="{{ '/' | relative_url }}" class="btn btn-primary">Back to Home</a>
                     </div>
                 {% endif %}
             </div>
             
-            <!-- 카테고리별 필터 (향후 구현) -->
+            <!-- Category filters (for future implementation) -->
             <aside class="blog-sidebar">
                 <div class="sidebar-section">
-                    <h3>카테고리</h3>
+                    <h3>Categories</h3>
                     <ul class="category-list">
                         {% assign categories = site.posts | map: 'category' | uniq | compact %}
                         {% for category in categories %}
@@ -117,7 +117,7 @@ description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로�
                 </div>
                 
                 <div class="sidebar-section">
-                    <h3>마일스톤별</h3>
+                    <h3>By Milestone</h3>
                     <ul class="milestone-list">
                         {% for i in (1..5) %}
                             {% assign milestone_posts = site.posts | where: 'milestone', i %}
@@ -134,7 +134,7 @@ description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로�
                 </div>
                 
                 <div class="sidebar-section">
-                    <h3>태그 클라우드</h3>
+                    <h3>Tag Cloud</h3>
                     <div class="tag-cloud">
                         {% assign tags = site.posts | map: 'tags' | join: ',' | split: ',' | uniq | compact %}
                         {% for tag in tags limit:20 %}
@@ -145,10 +145,10 @@ description: "Magnify macOS 앱 개발 과정을 단계별로 기록한 블로�
                 </div>
                 
                 <div class="sidebar-section">
-                    <h3>RSS 피드</h3>
+                    <h3>RSS Feed</h3>
                     <div class="feed-subscribe">
                         <a href="{{ '/feed.xml' | relative_url }}" target="_blank">
-                            📡 RSS 구독하기
+                            📡 Subscribe to RSS
                         </a>
                     </div>
                 </div>

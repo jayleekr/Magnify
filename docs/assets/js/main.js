@@ -1,34 +1,34 @@
 /**
  * Magnify Development Blog - Main JavaScript
- * Jekyll 기반 macOS 화면 주석 도구 개발 블로그
+ * Jekyll-based macOS screen annotation tool development blog
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 페이지 로드 애니메이션
+    // Page load animations
     initPageAnimations();
     
-    // 진행상황 업데이트
+    // Update progress
     updateProgressBars();
     
-    // 네비게이션 기능
+    // Navigation functionality
     initNavigation();
     
-    // 스크롤 기능
+    // Scroll functionality
     initSmoothScroll();
     
-    // 검색 기능 (향후 확장)
+    // Search functionality (future expansion)
     initSearch();
 });
 
 /**
- * 페이지 로드 시 애니메이션 초기화
+ * Initialize page load animations
  */
 function initPageAnimations() {
     const cards = document.querySelectorAll('.card');
     
     if (cards.length === 0) return;
     
-    // 카드 애니메이션
+    // Card animations
     cards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(30px)';
@@ -40,7 +40,7 @@ function initPageAnimations() {
         }, index * 100);
     });
     
-    // 타이틀 애니메이션
+    // Title animation
     const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {
         heroTitle.style.opacity = '0';
@@ -55,14 +55,14 @@ function initPageAnimations() {
 }
 
 /**
- * 진행상황 바 업데이트
+ * Update progress bars
  */
 function updateProgressBars() {
     const progressBars = document.querySelectorAll('.progress-fill');
     
-    // 마일스톤별 진행률 계산 (실제 데이터는 Jekyll 변수에서 가져올 수 있음)
+    // Milestone progress calculation (actual data can be fetched from Jekyll variables)
     const milestoneProgress = {
-        'milestone-1': 25,  // Checkpoint 1.1 완료
+        'milestone-1': 25,  // Checkpoint 1.1 completed
         'milestone-2': 0,
         'milestone-3': 0,
         'milestone-4': 0,
@@ -78,18 +78,18 @@ function updateProgressBars() {
         }, 500 + (index * 200));
     });
     
-    // 체크포인트 상태 업데이트
+    // Update checkpoint status
     updateCheckpointStatus();
 }
 
 /**
- * 체크포인트 상태 업데이트
+ * Update checkpoint status
  */
 function updateCheckpointStatus() {
     const checkpoints = document.querySelectorAll('.checkpoint-list li');
     
-    // 완료된 체크포인트 (예시)
-    const completedCheckpoints = ['1.1']; // Jekyll에서 동적으로 설정 가능
+    // Completed checkpoints (example)
+    const completedCheckpoints = ['1.1']; // Can be set dynamically from Jekyll
     
     checkpoints.forEach(checkpoint => {
         const text = checkpoint.textContent;
@@ -103,10 +103,10 @@ function updateCheckpointStatus() {
 }
 
 /**
- * 네비게이션 기능 초기화
+ * Initialize navigation functionality
  */
 function initNavigation() {
-    // 모바일 메뉴 토글 (필요시 추가)
+    // Mobile menu toggle (add if needed)
     const navToggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-links');
     
@@ -116,12 +116,12 @@ function initNavigation() {
         });
     }
     
-    // 활성 링크 하이라이트
+    // Highlight active link
     highlightActiveNavLink();
 }
 
 /**
- * 활성 네비게이션 링크 하이라이트
+ * Highlight active navigation link
  */
 function highlightActiveNavLink() {
     const navLinks = document.querySelectorAll('.nav-link');
@@ -139,7 +139,7 @@ function highlightActiveNavLink() {
 }
 
 /**
- * 부드러운 스크롤 기능
+ * Initialize smooth scroll functionality
  */
 function initSmoothScroll() {
     const anchors = document.querySelectorAll('a[href^="#"]');
@@ -165,10 +165,10 @@ function initSmoothScroll() {
 }
 
 /**
- * 검색 기능 초기화 (향후 확장)
+ * Initialize search functionality (future expansion)
  */
 function initSearch() {
-    // 검색 입력 필드가 있을 경우 처리
+    // Handle search input field if exists
     const searchInput = document.querySelector('#search-input');
     
     if (searchInput) {
@@ -185,17 +185,17 @@ function initSearch() {
 }
 
 /**
- * 검색 실행 (향후 구현)
+ * Execute search (future implementation)
  */
 function performSearch(query) {
     if (query.length < 2) return;
     
-    // Jekyll Search나 Lunr.js를 사용한 검색 구현
+    // Search implementation using Jekyll Search or Lunr.js
     console.log('Searching for:', query);
 }
 
 /**
- * 카드 호버 효과 강화
+ * Enhance card hover effects
  */
 function enhanceCardEffects() {
     const cards = document.querySelectorAll('.card');
@@ -212,7 +212,7 @@ function enhanceCardEffects() {
 }
 
 /**
- * 스크롤 시 헤더 스타일 변경
+ * Change header style on scroll
  */
 function initScrollHeader() {
     const header = document.querySelector('.site-header');
@@ -231,7 +231,7 @@ function initScrollHeader() {
 }
 
 /**
- * 다크모드 토글 (향후 구현)
+ * Dark mode toggle (future implementation)
  */
 function initDarkMode() {
     const darkModeToggle = document.querySelector('#dark-mode-toggle');
@@ -242,7 +242,7 @@ function initDarkMode() {
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         });
         
-        // 저장된 다크모드 설정 불러오기
+        // Load saved dark mode setting
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
@@ -250,7 +250,7 @@ function initDarkMode() {
 }
 
 /**
- * 코드 블록 복사 기능
+ * Code block copy functionality
  */
 function initCodeCopy() {
     const codeBlocks = document.querySelectorAll('pre');
@@ -258,15 +258,15 @@ function initCodeCopy() {
     codeBlocks.forEach(block => {
         const copyButton = document.createElement('button');
         copyButton.className = 'copy-code-btn';
-        copyButton.textContent = '복사';
-        copyButton.setAttribute('aria-label', '코드 복사');
+        copyButton.textContent = 'Copy';
+        copyButton.setAttribute('aria-label', 'Copy code');
         
         copyButton.addEventListener('click', () => {
             const code = block.textContent;
             navigator.clipboard.writeText(code).then(() => {
-                copyButton.textContent = '복사됨!';
+                copyButton.textContent = 'Copied!';
                 setTimeout(() => {
-                    copyButton.textContent = '복사';
+                    copyButton.textContent = 'Copy';
                 }, 2000);
             });
         });
@@ -277,7 +277,7 @@ function initCodeCopy() {
 }
 
 /**
- * 성능 최적화를 위한 이미지 지연 로딩
+ * Lazy loading for performance optimization
  */
 function initLazyLoading() {
     const images = document.querySelectorAll('img[data-src]');
@@ -297,14 +297,14 @@ function initLazyLoading() {
 }
 
 /**
- * 사용자 상호작용 트래킹 (선택적)
+ * User interaction tracking (optional)
  */
 function initAnalytics() {
-    // Google Analytics나 기타 분석 도구 초기화
-    // 개인정보 보호를 고려하여 구현
+    // Initialize Google Analytics or other analytics tools
+    // Implement with privacy considerations
 }
 
-// 추가 기능들을 페이지 로드 후 초기화
+// Initialize additional features after page load
 window.addEventListener('load', function() {
     enhanceCardEffects();
     initScrollHeader();
@@ -313,7 +313,7 @@ window.addEventListener('load', function() {
     initLazyLoading();
 });
 
-// 서비스 워커 등록 (PWA 기능, 선택적)
+// Service worker registration (PWA functionality, optional)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')

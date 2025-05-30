@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: 'ko' }}">
+<html lang="{{ site.lang | default: 'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,9 +42,9 @@
                 </a>
                 
                 <div class="nav-links">
-                    <a href="{{ '/' | relative_url }}" class="nav-link">홈</a>
-                    <a href="{{ '/blog/' | relative_url }}" class="nav-link">블로그</a>
-                    <a href="{{ '/milestones/' | relative_url }}" class="nav-link">마일스톤</a>
+                    <a href="{{ '/' | relative_url }}" class="nav-link">Home</a>
+                    <a href="{{ '/blog/' | relative_url }}" class="nav-link">Blog</a>
+                    <a href="{{ '/milestones/' | relative_url }}" class="nav-link">Milestones</a>
                     <a href="{{ site.project.github_repo }}" class="nav-link" target="_blank">GitHub</a>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h4>링크</h4>
+                    <h4>Links</h4>
                     <ul>
                         <li><a href="{{ site.project.github_repo }}" target="_blank">GitHub Repository</a></li>
                         <li><a href="{{ '/feed.xml' | relative_url }}">RSS Feed</a></li>
@@ -73,10 +73,10 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h4>진행상황</h4>
+                    <h4>Progress</h4>
                     <ul>
-                        <li>마일스톤: {{ site.progress.current_milestone }}/{{ site.progress.total_milestones }}</li>
-                        <li>체크포인트: {{ site.progress.current_checkpoint }}/{{ site.progress.total_checkpoints }}</li>
+                        <li>Milestone: {{ site.progress.current_milestone }}/{{ site.progress.total_milestones }}</li>
+                        <li>Checkpoint: {{ site.progress.current_checkpoint }}/{{ site.progress.total_checkpoints }}</li>
                     </ul>
                 </div>
             </div>

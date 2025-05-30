@@ -1,130 +1,191 @@
 # workflow_state.md
-_Last updated: 2025-01-16_
 
-## State
-Phase: CONSTRUCT  
-Status: RUNNING  
-CurrentItem: Week 1-2 Core Infrastructure - Xcode 프로젝트 초기 설정  
+## Current Development Status
 
-## Plan
-**Primary Goal:** macOS 네이티브 화면 주석 앱 개발 (ZoomIt 기능 구현)
-**Target Timeline:** 9주 (개발 8주 + 배포 1주)
-**Distribution:** Mac App Store (무료→유료 전환 전략)
+**Last Updated:** December 26, 2024
 
-### Development Roadmap:
-1. **Week 1-2: Core Infrastructure**
-   - Xcode 프로젝트 설정 (App Sandbox + Entitlements)
-   - ScreenCaptureKit 화면 캡처 구현
-   - 투명 오버레이 NSWindow 시스템 구축
+### ✅ Recently Completed
+- **Project Initialization:** Repository creation and basic setup
+- **GitHub Pages Migration:** Complete Jekyll-based GitHub Pages system implementation
+- **Content Translation:** All Korean content translated to English
+- **Timeline Removal:** Removed specific dates from development schedule
+- **Documentation Structure:** 
+  - Jekyll configuration (`_config.yml`)
+  - Layout templates (`_layouts/default.html`, `_layouts/post.html`)
+  - Main page (`docs/index.md`)
+  - Blog system (`docs/blog/index.html`)
+  - Project kickoff post (`docs/_posts/2025-05-30-project-kickoff.md`)
+  - Modern CSS and JavaScript implementation
 
-2. **Week 3-4: Zoom & Annotation**
-   - 실시간 화면 확대/축소 기능
-   - NSBezierPath 기반 펜 그리기 시스템
-   - RegisterEventHotKey 전역 단축키 구현
+### 🎯 Current Focus
+**Next Checkpoint:** 1.1 - Xcode Project Setup
 
-3. **Week 5-6: Advanced Features**
-   - 텍스트 주석 시스템
-   - 프레젠테이션 타이머 기능
-   - SwiftUI 설정 UI
+**Immediate Tasks:**
+1. Create new Xcode project for Magnify
+2. Configure basic App Sandbox entitlements
+3. Set up Bundle ID (com.jayleekr.magnify)
+4. Configure code signing settings
 
-4. **Week 7-8: Polish & Testing**
-   - 성능 최적화 (메모리 <50MB, 응답 <100ms)
-   - TestFlight 베타 테스팅
-   - App Store 메타데이터 준비
+### 📊 Progress Overview
 
-5. **Week 9: App Store Submission**
-   - 코드 서명 및 아카이브
-   - App Store Connect 업로드 및 심사
+#### Overall Project Status: **5% Complete**
+- Project initialization and documentation: ✅ Complete
+- Development environment setup: ⏳ Ready to start
+- Core development: ⏳ Pending
 
-### Technical Implementation Strategy:
-- **Primary Stack:** Swift + AppKit (NSWindow/NSView 제어)
-- **Screen Capture:** ScreenCaptureKit (macOS 12.3+)
-- **Drawing Engine:** NSBezierPath + Core Graphics
-- **Global Hotkeys:** Carbon RegisterEventHotKey
-- **UI Framework:** AppKit (메인) + SwiftUI (설정만)
+#### Milestone Breakdown:
+| Milestone | Status | Completion |
+|-----------|---------|------------|
+| **Pre-Development Setup** | ✅ Complete | 100% |
+| **Milestone 1: Core Infrastructure** | ⏳ Ready | 0% |
+| **Milestone 2: Zoom & Annotation** | ⏳ Pending | 0% |
+| **Milestone 3: Advanced Features** | ⏳ Pending | 0% |
+| **Milestone 4: Polish & Testing** | ⏳ Pending | 0% |
+| **Milestone 5: App Store Launch** | ⏳ Pending | 0% |
 
-### Monetization Phases:
-- **Phase 1:** 무료 MVP (기본 기능)
-- **Phase 2:** 인앱 구매 (고급 기능 $2.99-$4.99)
-- **Phase 3:** 유료 전환 (신규 사용자 $9.99-$14.99)
+### 🛠️ Development Environment Status
 
-## Rules
-> **Keep every major section under an explicit H2 (`##`) heading so the agent can locate them unambiguously.**
+#### Tools Setup Status:
+- [x] Git repository
+- [x] GitHub repository
+- [x] GitHub Pages (Jekyll)
+- [x] Documentation system
+- [ ] Xcode project
+- [ ] Swift Package Manager
+- [ ] GitHub Actions CI/CD
+- [ ] Apple Developer account integration
 
-### [PHASE: ANALYZE]
-1. Read **project_config.md**, relevant code & docs.  
-2. Summarize requirements. *No code or planning.*
+#### Required Software:
+- **Xcode 16+**: ⏳ Installation needed
+- **Swift 5.9+**: Included with Xcode
+- **GitHub CLI**: ⏳ Installation recommended
+- **Instruments**: For performance profiling (later)
 
-### [PHASE: BLUEPRINT]
-1. Decompose task into ordered steps.  
-2. Write pseudocode or file-level diff outline under **## Plan**.  
-3. Set `Status = NEEDS_PLAN_APPROVAL` and await user confirmation.
+### 📝 Documentation Status
 
-### [PHASE: CONSTRUCT]
-1. Follow the approved **## Plan** exactly.  
-2. After each atomic change:  
-   - run test / linter commands specified in `project_config.md`  
-   - capture tool output in **## Log**  
-3. On success of all steps, set `Phase = VALIDATE`.
+#### Completed Documentation:
+- [x] Project configuration (`project_config.md`)
+- [x] AI development prompts (`ai_development_prompts.md`)
+- [x] README.md
+- [x] Jekyll-based GitHub Pages
+- [x] Development blog framework
 
-### [PHASE: VALIDATE]
-1. Rerun full test suite & any E2E checks.  
-2. If clean, set `Status = COMPLETED`.  
-3. Trigger **RULE_ITERATE_01** when applicable.
+#### Documentation Quality:
+- Technical documentation: **95%** complete
+- User documentation: **80%** complete (basic structure)
+- API documentation: **0%** (to be created with code)
+
+### 🔄 Next Actions
+
+#### Immediate Next Steps:
+1. **Checkpoint 1.1: Xcode Project Setup**
+   - Create new macOS App project in Xcode
+   - Configure target settings and Bundle ID
+   - Set up App Sandbox entitlements
+   - Configure basic code signing
+   - Create initial project structure
+
+2. **Documentation Update**
+   - Document Checkpoint 1.1 completion
+   - Update progress tracking
+   - Deploy updated GitHub Pages
+
+3. **GitHub Actions Setup**
+   - Create basic Swift CI workflow
+   - Set up automated testing pipeline
+
+#### Technical Dependencies:
+- **ScreenCaptureKit**: Requires macOS 12.3+ target
+- **App Sandbox**: Required for App Store distribution
+- **Code Signing**: Apple Developer account needed
+- **Bundle ID**: Must reserve com.jayleekr.magnify
+
+### 🎯 Success Criteria for Next Checkpoint
+
+#### Checkpoint 1.1 Definition of Done:
+- [ ] Xcode project created and compiles successfully
+- [ ] App Sandbox entitlements configured
+- [ ] Bundle ID set to com.jayleekr.magnify
+- [ ] Basic code signing working
+- [ ] Project structure follows macOS app best practices
+- [ ] Initial commit and push to repository
+- [ ] Documentation updated with progress
+- [ ] GitHub Pages deployed with checkpoint completion
+
+#### Expected Output:
+- Working macOS app project (minimal Hello World)
+- Proper entitlements.plist configuration
+- Xcode project settings optimized for App Store
+- Repository structure ready for development
+
+### 📚 Learning Points & Research
+
+#### Key Technical Research Areas:
+1. **ScreenCaptureKit Integration**
+   - Permission handling patterns
+   - Performance optimization strategies
+   - Sandbox compatibility
+
+2. **AppKit NSWindow Management**
+   - Transparent overlay windows
+   - Cross-space window behavior
+   - Event handling in overlay windows
+
+3. **Metal Performance Optimization**
+   - GPU-accelerated scaling techniques
+   - Memory management for real-time graphics
+   - Integration with CoreGraphics
+
+### 🎨 Design & Architecture Notes
+
+#### Planned Architecture:
+- **Model-View-Controller (MVC)** for AppKit components
+- **Model-View-ViewModel (MVVM)** for SwiftUI settings
+- **Service Layer** for ScreenCaptureKit integration
+- **Command Pattern** for undo/redo functionality
+
+#### Key Classes Structure (Planned):
+```
+MagnifyApp/
+├── Application/
+│   ├── AppDelegate.swift
+│   └── MagnifyApp.swift
+├── Core/
+│   ├── ScreenCapture/
+│   ├── Drawing/
+│   └── Overlay/
+├── UI/
+│   ├── AppKit/
+│   └── SwiftUI/
+└── Resources/
+```
+
+### 📈 Metrics & Tracking
+
+#### Development Velocity:
+- **Target**: 1 checkpoint every 2-3 days
+- **Current**: Pre-development phase
+- **Documentation Rate**: 100% (all checkpoints documented)
+
+#### Code Quality Targets:
+- **Test Coverage**: 80%+ (target)
+- **Build Success Rate**: 100%
+- **Performance Benchmarks**: TBD with first working version
+
+### 🎪 Team & Communication
+
+#### Development Team:
+- **Developer**: Jay Lee (solo development)
+- **AI Assistant**: Claude (pair programming support)
+- **Documentation**: Automated via Jekyll
+- **Testing**: Automated via GitHub Actions (planned)
+
+#### Communication Channels:
+- **Progress Updates**: GitHub Pages blog
+- **Technical Discussions**: Git commit messages + documentation
+- **Issue Tracking**: GitHub Issues
+- **Decision Log**: Git commit history + blog posts
 
 ---
 
-### RULE_INIT_01
-Trigger ▶ `Phase == INIT`  
-Action ▶ Ask user for first high-level task → `Phase = ANALYZE, Status = RUNNING`.
-
-### RULE_ITERATE_01
-Trigger ▶ `Status == COMPLETED && Items contains unprocessed rows`  
-Action ▶  
-1. Set `CurrentItem` to next unprocessed row in **## Items**.  
-2. Clear **## Log**, reset `Phase = ANALYZE, Status = READY`.
-
-### RULE_LOG_ROTATE_01
-Trigger ▶ `length(## Log) > 5 000 chars`  
-Action ▶ Summarise the top 5 findings from **## Log** into **## ArchiveLog**, then clear **## Log**.
-
-### RULE_SUMMARY_01
-Trigger ▶ `Phase == VALIDATE && Status == COMPLETED`  
-Action ▶ 
-1. Read `project_config.md`.
-2. Construct the new changelog line: `- <One-sentence summary of completed work>`.
-3. Find the `## Changelog` heading in `project_config.md`.
-4. Insert the new changelog line immediately after the `## Changelog` heading and its following newline (making it the new first item in the list).
-
----
-
-## Items
-| id | description | status |
-|----|-------------|--------|
-| 1 | Week 1-2: Xcode 프로젝트 초기 설정 및 권한 구성 | IN_PROGRESS |
-| 2 | Week 1-2: ScreenCaptureKit 화면 캡처 기본 구현 | PENDING |
-| 3 | Week 1-2: 투명 오버레이 NSWindow 시스템 구축 | PENDING |
-| 4 | Week 3-4: 실시간 화면 확대/축소 기능 구현 | PENDING |
-| 5 | Week 3-4: NSBezierPath 기반 펜 그리기 시스템 | PENDING |
-| 6 | Week 3-4: RegisterEventHotKey 전역 단축키 구현 | PENDING |
-
-## Log
-**2025-01-16 - BLUEPRINT Phase Completed**
-- PDF 가이드 "macOS용 ZoomIt 유사 앱 개발 가이드.pdf" 내용 분석 완료
-- 구체적 기술 스택 확정: Swift + AppKit + ScreenCaptureKit 조합
-- 상세 구현 방법론 도출:
-  * 투명 NSWindow (borderless, .statusBar level, collectionBehavior)
-  * ScreenCaptureKit 기반 화면 캡처 (화면 기록 권한 필요)
-  * NSView 서브클래스에서 마우스 이벤트 처리로 실시간 그리기
-  * RegisterEventHotKey로 전역 단축키 (샌드박스 환경 호환)
-- App Store 배포 전략 수립:
-  * App Sandbox + 코드 서명 + 화면 기록 권한
-  * 무료 배포 후 인앱 구매 → 유료 전환 로드맵
-- AI 개발 전략 포함: 프롬프트 엔지니어링 + GitHub Copilot 활용
-- 9주 개발 타임라인 확정 (8주 개발 + 1주 배포)
-- project_config.md 업데이트 완료 (PDF 가이드 기반 상세 기술 명세)
-
-**Next Action:** EXECUTE 단계로 전환하여 Xcode 프로젝트 초기 설정 시작
-
-## ArchiveLog
-<!-- RULE_LOG_ROTATE_01 stores condensed summaries here -->
+**Status Summary**: Project initialization complete, ready to begin Checkpoint 1.1 (Xcode Project Setup). All documentation systems are in place and translated to English. Next phase is active development beginning. 

@@ -7,14 +7,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let screenCaptureManager = ScreenCaptureManager()
     private var imageView: NSImageView?
     private var overlayWindow: OverlayWindow?
+    private let hotkeyManager = HotkeyManager.shared
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMainWindow()
         checkScreenCapturePermission()
+        setupGlobalHotkeys()
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
+    }
+    
+    func applicationWillTerminate(_ notification: Notification) {
+        // Clean up global hotkeys
+        hotkeyManager.unregisterAllHotkeys()
+        print("AppDelegate: Cleaned up all global hotkeys on app termination")
     }
     
     // MARK: - Window Setup
@@ -92,6 +100,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         clearDrawingButton.action = #selector(clearDrawingPressed)
         contentView.addSubview(clearDrawingButton)
         
+        // Hotkey status button
+        let hotkeyStatusButton = NSButton(frame: NSRect(x: 200, y: 290, width: 200, height: 30))
+        hotkeyStatusButton.title = "Test Global Hotkey (⌘⇧M)"
+        hotkeyStatusButton.bezelStyle = .rounded
+        hotkeyStatusButton.target = self
+        hotkeyStatusButton.action = #selector(testHotkeyPressed)
+        contentView.addSubview(hotkeyStatusButton)
+        
         // Image view for displaying captured screen
         let imageFrame = NSRect(x: 50, y: 50, width: 500, height: 300)
         imageView = NSImageView(frame: imageFrame)
@@ -109,11 +125,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         // Instructions label
-        let instructionsLabel = NSTextField(labelWithString: "Test screen capture and transparent overlay window with drawing capabilities")
+        let instructionsLabel = NSTextField(labelWithString: "Test screen capture and transparent overlay window with drawing capabilities\nUse ⌘⇧M (Cmd+Shift+M) to toggle overlay from anywhere in the system")
         instructionsLabel.alignment = .center
         instructionsLabel.font = NSFont.systemFont(ofSize: 12)
-        instructionsLabel.frame = NSRect(x: 50, y: 20, width: 500, height: 20)
+        instructionsLabel.frame = NSRect(x: 50, y: 10, width: 500, height: 40)
         instructionsLabel.textColor = .tertiaryLabelColor
+        instructionsLabel.maximumNumberOfLines = 2
         contentView.addSubview(instructionsLabel)
     }
     
@@ -294,5 +311,92 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             contentView.clearDrawing()
             print("AppDelegate: Overlay drawing cleared")
         }
+    }
+    
+    @objc private func testHotkeyPressed() {
+        let isRegistered = hotkeyManager.isHotkeyRegistered(identifier: "overlay_toggle")
+        let registeredHotkeys = hotkeyManager.getRegisteredHotkeys()
+        
+        let alert = NSAlert()
+        alert.messageText = "Global Hotkey Status"
+        
+        if isRegistered {
+            alert.informativeText = """
+            ✅ Global hotkey is registered successfully!
+            
+            Hotkey: ⌘⇧M (Cmd+Shift+M)
+            Function: Toggle overlay window
+            
+            Try pressing ⌘⇧M anywhere in the system to toggle the overlay.
+            
+            Registered hotkeys: \(registeredHotkeys.joined(separator: ", "))
+            """
+            alert.alertStyle = .informational
+        } else {
+            alert.informativeText = """
+            ❌ Global hotkey registration failed.
+            
+            This could be due to:
+            • System security restrictions
+            • Another app using the same hotkey
+            • Insufficient permissions
+            
+            You can still use the overlay buttons in this app.
+            """
+            alert.alertStyle = .warning
+        }
+        
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+    
+    // MARK: - Global Hotkeys
+    
+    private func setupGlobalHotkeys() {
+        // Set up hotkey handler for overlay toggle
+        hotkeyManager.setHotkeyHandler { [weak self] descriptor in
+            switch descriptor.identifier {
+            case "overlay_toggle":
+                self?.toggleOverlay()
+            default:
+                print("AppDelegate: Unknown hotkey pressed: \(descriptor.identifier)")
+            }
+        }
+        
+        // Register the default overlay toggle hotkey (Cmd+Shift+M)
+        let success = hotkeyManager.registerDefaultOverlayToggle()
+        if success {
+            print("AppDelegate: Successfully registered global hotkey ⌘⇧M for overlay toggle")
+        } else {
+            print("AppDelegate: Failed to register global hotkey - hotkey functionality disabled")
+            
+            // Show alert to user about hotkey registration failure
+            DispatchQueue.main.async {
+                self.showHotkeyRegistrationAlert()
+            }
+        }
+    }
+    
+    private func toggleOverlay() {
+        if overlayWindow == nil {
+            overlayWindow = OverlayWindow()
+        }
+        
+        if overlayWindow?.isOverlayVisible == true {
+            overlayWindow?.hideOverlay()
+            print("AppDelegate: Overlay hidden via global hotkey")
+        } else {
+            overlayWindow?.showOverlay()
+            print("AppDelegate: Overlay shown via global hotkey")
+        }
+    }
+    
+    private func showHotkeyRegistrationAlert() {
+        let alert = NSAlert()
+        alert.messageText = "Global Hotkey Registration Failed"
+        alert.informativeText = "Unable to register the global hotkey (⌘⇧M) for overlay toggle. You can still use the buttons in the app to control the overlay."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
 } 

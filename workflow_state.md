@@ -4,8 +4,8 @@
 - **Phase**: DEVELOP
 - **Status**: IN_PROGRESS  
 - **Current Task**: Milestone 1 - Core Infrastructure
-- **Current Step**: Checkpoint 1.4 - Global Hotkey System
-- **Current Item**: Implementing system-wide keyboard shortcuts for overlay toggle
+- **Current Step**: Checkpoint 1.5 - Settings and Preferences System
+- **Current Item**: Creating SwiftUI preferences window for configuration management
 
 ## Progress Summary
 
@@ -60,22 +60,38 @@
 - `Tests/OverlayWindowTests.swift` - Comprehensive test coverage
 - Enhanced `Sources/Magnify/App/AppDelegate.swift` - Overlay window integration and test UI
 
+#### Checkpoint 1.4: Global Hotkey System (COMPLETED)
+- ✅ Created HotkeyManager class with global event tap functionality
+- ✅ Implemented system-wide keyboard shortcut registration (Cmd+Shift+M)
+- ✅ Built App Sandbox compatible implementation using Carbon Event Manager
+- ✅ Added integration with OverlayWindow for toggle functionality
+- ✅ Implemented proper hotkey conflict detection and error handling
+- ✅ Created comprehensive test suite (HotkeyManagerTests.swift)
+- ✅ Enhanced AppDelegate with hotkey setup and management
+- ✅ Added hotkey status testing and user feedback
+- ✅ Implemented proper cleanup on app termination
+
+**Key Files Created:**
+- `Sources/Magnify/Utils/HotkeyManager.swift` - Complete global hotkey system
+- `Tests/HotkeyManagerTests.swift` - Comprehensive test coverage
+- Enhanced `Sources/Magnify/App/AppDelegate.swift` - Hotkey integration and testing UI
+
 ### 🚧 Current Checkpoint
 
-#### Checkpoint 1.4: Global Hotkey System (IN_PROGRESS)
+#### Checkpoint 1.5: Settings and Preferences System (IN_PROGRESS)
 **Objectives:**
-- Implement system-wide keyboard shortcuts for overlay toggle
-- Create HotkeyManager class for global event handling
-- Add support for customizable hotkey combinations
-- Ensure App Sandbox compatibility
-- Test hotkey functionality across different system states
+- Create SwiftUI-based preferences window
+- Implement configuration management system
+- Add user customization options for hotkeys, colors, and behavior
+- Integrate with existing systems (overlay, hotkeys, screen capture)
+- Create persistent settings storage
 
 **Next Steps:**
-1. Create HotkeyManager class using Carbon Event Manager
-2. Implement global event tap with proper permissions
-3. Add hotkey registration and unregistration
-4. Integrate with OverlayWindow for toggle functionality
-5. Test system-wide hotkey behavior
+1. Create PreferencesManager class for configuration
+2. Implement SwiftUI preferences window
+3. Add hotkey customization interface
+4. Integrate drawing color and tool preferences
+5. Test preferences persistence and integration
 
 ## Embedded Rules
 
@@ -93,14 +109,15 @@
 
 ## Active Plan
 
-**Current Focus**: Implementing global hotkey system for system-wide overlay toggle functionality. This enables users to quickly show/hide the annotation overlay from anywhere in the system.
+**Current Focus**: Implementing settings and preferences system with SwiftUI interface for user customization. This creates a professional configuration experience allowing users to customize hotkeys, drawing tools, and app behavior.
 
-**Success Criteria for Checkpoint 1.4**:
-- HotkeyManager class with global event tap functionality
-- System-wide keyboard shortcut registration (e.g., Cmd+Shift+M)
-- App Sandbox compatible implementation
-- Integration with OverlayWindow for toggle functionality
-- Proper hotkey conflict detection and error handling
+**Success Criteria for Checkpoint 1.5**:
+- PreferencesManager class with persistent configuration storage
+- SwiftUI preferences window with tabbed interface
+- Hotkey customization with conflict detection
+- Drawing tool preferences (colors, stroke width, opacity)
+- App behavior settings (startup, overlay behavior, performance)
+- Integration with existing HotkeyManager and OverlayWindow systems
 
 ## Operational Log
 
@@ -131,7 +148,16 @@
 - **Test Suite Development**: ✅ Comprehensive OverlayWindowTests.swift with full coverage
 - **AppDelegate Integration**: ✅ Enhanced UI with overlay window test functionality
 - **17:30**: ✅ **Checkpoint 1.3 COMPLETED** - Transparent Overlay Window System complete
-- **Next Phase**: 🚧 **Starting Checkpoint 1.4** - Global Hotkey System
+- **Git Repository Fix**: 🔧 Resolved unrelated histories merge conflict and synchronized with remote
+- **Started Checkpoint 1.4**: 🚧 Global Hotkey System implementation
+- **HotkeyManager Implementation**: ✅ Complete Carbon Event Manager integration with singleton pattern
+- **Global Hotkey Registration**: ✅ System-wide Cmd+Shift+M hotkey for overlay toggle
+- **AppDelegate Integration**: ✅ Hotkey handler setup with overlay toggle functionality
+- **Test Suite Creation**: ✅ Comprehensive HotkeyManagerTests.swift with full coverage
+- **User Interface Enhancement**: ✅ Added hotkey status button and informational alerts
+- **Error Handling**: ✅ Proper cleanup on app termination and conflict detection
+- **18:45**: ✅ **Checkpoint 1.4 COMPLETED** - Global Hotkey System complete
+- **Next Phase**: 🚧 **Starting Checkpoint 1.5** - Settings and Preferences System
 
 # workflow_state.md
 

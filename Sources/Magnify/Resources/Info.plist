@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>Magnify</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.jayleekr.magnify</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Magnify</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.3</string>
+    <key>NSMainStoryboardFile</key>
+    <string>Main</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSSupportsAutomaticTermination</key>
+    <true/>
+    <key>NSSupportsSuddenTermination</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    
+    <!-- Privacy Permissions -->
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Magnify needs access to save screenshots and recordings to your Desktop.</string>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>Magnify needs access to save screenshots and recordings to your Documents folder.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Magnify may access your camera for screen recording features.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Magnify may access your microphone for screen recording with audio.</string>
+    
+    <!-- App Category -->
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
+    
+    <!-- Document Types -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>png</string>
+                <string>jpg</string>
+                <string>jpeg</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSTypeIsPackage</key>
+            <false/>
+        </dict>
+    </array>
+</dict>
+</plist> 

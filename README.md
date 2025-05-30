@@ -37,7 +37,7 @@
 
 | Milestone | Status | Progress |
 |-----------|--------|----------|
-| **Milestone 1: Core Infrastructure** | 🚧 In Progress | 25% |
+| **Milestone 1: Core Infrastructure** | 🚧 In Progress | 50% |
 | **Milestone 2: Zoom & Annotation** | ⏳ Pending | 0% |
 | **Milestone 3: Advanced Features** | ⏳ Pending | 0% |
 | **Milestone 4: Polish & Testing** | ⏳ Pending | 0% |
@@ -47,17 +47,18 @@
 
 #### Milestone 1: Core Infrastructure
 - [x] **Checkpoint 1.1:** ✅ Xcode project setup (COMPLETED)
-- [ ] **Checkpoint 1.2:** 🚧 ScreenCaptureKit implementation (IN_PROGRESS)
-- [ ] **Checkpoint 1.3:** ⏳ Transparent overlay window system
+- [x] **Checkpoint 1.2:** ✅ ScreenCaptureKit implementation (COMPLETED)
+- [ ] **Checkpoint 1.3:** 🚧 Transparent overlay window system (NEXT)
 - [ ] **Checkpoint 1.4:** ⏳ Global hotkey implementation
 
-#### Latest Achievement: Checkpoint 1.1 Complete! 🎉
-- Created complete Swift package structure with proper organization
-- Implemented AppDelegate.swift with ScreenCaptureKit permission handling  
-- Configured App Sandbox entitlements and Bundle ID for App Store distribution
-- Set up comprehensive project documentation and testing framework
+#### Latest Achievement: Checkpoint 1.2 Complete! 🎉
+- Implemented comprehensive ScreenCaptureManager with async/await ScreenCaptureKit integration
+- Added test UI with screen capture button and real-time performance measurement
+- Created extensive unit test suite with performance, memory, and permission testing
+- Enhanced AppDelegate with proper error handling and user feedback systems
+- Achieved <100ms screen capture response time requirement
 
-**📖 [Read the full progress blog post →](https://jayleekr.github.io/Magnify/2025/01/16/checkpoint-1-1-completed.html)**
+**📖 [Read the full progress blog post →](https://jayleekr.github.io/Magnify/2025/05/30/checkpoint-1-1-completed.html)**
 
 ## 📖 Development Blog
 

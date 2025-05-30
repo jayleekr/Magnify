@@ -14,13 +14,19 @@ let package = Package(
             targets: ["Magnify"]
         ),
     ],
+    dependencies: [
+        // Add any external dependencies here if needed
+    ],
     targets: [
         .executableTarget(
-            name: "Magnify"
+            name: "Magnify",
+            dependencies: [],
+            path: "Sources/Magnify"
         ),
         .testTarget(
             name: "MagnifyTests",
-            dependencies: ["Magnify"]
+            dependencies: ["Magnify"],
+            path: "Tests"
         ),
     ]
 )

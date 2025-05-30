@@ -4,6 +4,8 @@ import ScreenCaptureKit
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     var mainWindow: NSWindow?
+    private let screenCaptureManager = ScreenCaptureManager()
+    private var imageView: NSImageView?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMainWindow()
@@ -17,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Window Setup
     
     private func setupMainWindow() {
-        let contentRect = NSRect(x: 0, y: 0, width: 480, height: 320)
+        let contentRect = NSRect(x: 0, y: 0, width: 600, height: 500)
         
         mainWindow = NSWindow(
             contentRect: contentRect,
@@ -26,49 +28,211 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             defer: false
         )
         
-        mainWindow?.title = "Magnify"
+        mainWindow?.title = "Magnify - Screen Capture Test"
         mainWindow?.center()
         mainWindow?.makeKeyAndOrderFront(nil)
         
-        // Set up basic content view
-        let contentView = NSView(frame: contentRect)
+        setupTestUI()
+    }
+    
+    private func setupTestUI() {
+        guard let window = mainWindow else { return }
+        
+        let contentView = NSView(frame: window.contentView?.bounds ?? NSRect.zero)
         contentView.wantsLayer = true
         contentView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
-        mainWindow?.contentView = contentView
+        window.contentView = contentView
         
-        // Add a simple label for now
-        let label = NSTextField(labelWithString: "Magnify - Screen Annotation Tool")
-        label.alignment = .center
-        label.font = NSFont.systemFont(ofSize: 16)
-        label.frame = NSRect(x: 50, y: 150, width: 380, height: 30)
-        contentView.addSubview(label)
+        // Title label
+        let titleLabel = NSTextField(labelWithString: "Magnify - ScreenCaptureKit Test")
+        titleLabel.alignment = .center
+        titleLabel.font = NSFont.boldSystemFont(ofSize: 18)
+        titleLabel.frame = NSRect(x: 50, y: 440, width: 500, height: 30)
+        contentView.addSubview(titleLabel)
+        
+        // Permission status label
+        let permissionLabel = NSTextField(labelWithString: "Permission Status: Checking...")
+        permissionLabel.alignment = .center
+        permissionLabel.font = NSFont.systemFont(ofSize: 14)
+        permissionLabel.frame = NSRect(x: 50, y: 410, width: 500, height: 20)
+        permissionLabel.textColor = .secondaryLabelColor
+        contentView.addSubview(permissionLabel)
+        
+        // Store reference for updates
+        permissionLabel.identifier = NSUserInterfaceItemIdentifier("permissionLabel")
+        
+        // Capture button
+        let captureButton = NSButton(frame: NSRect(x: 250, y: 370, width: 100, height: 30))
+        captureButton.title = "Capture Screen"
+        captureButton.bezelStyle = .rounded
+        captureButton.target = self
+        captureButton.action = #selector(captureButtonPressed)
+        contentView.addSubview(captureButton)
+        
+        // Image view for displaying captured screen
+        let imageFrame = NSRect(x: 50, y: 50, width: 500, height: 300)
+        imageView = NSImageView(frame: imageFrame)
+        imageView?.imageScaling = .scaleProportionallyUpOrDown
+        imageView?.wantsLayer = true
+        imageView?.layer?.borderWidth = 1
+        imageView?.layer?.borderColor = NSColor.separatorColor.cgColor
+        imageView?.layer?.cornerRadius = 8
+        
+        // Placeholder image
+        imageView?.image = createPlaceholderImage()
+        
+        if let imageView = imageView {
+            contentView.addSubview(imageView)
+        }
+        
+        // Instructions label
+        let instructionsLabel = NSTextField(labelWithString: "Click 'Capture Screen' to test ScreenCaptureKit functionality")
+        instructionsLabel.alignment = .center
+        instructionsLabel.font = NSFont.systemFont(ofSize: 12)
+        instructionsLabel.frame = NSRect(x: 50, y: 20, width: 500, height: 20)
+        instructionsLabel.textColor = .tertiaryLabelColor
+        contentView.addSubview(instructionsLabel)
+    }
+    
+    private func createPlaceholderImage() -> NSImage {
+        let size = NSSize(width: 400, height: 200)
+        let image = NSImage(size: size)
+        
+        image.lockFocus()
+        NSColor.controlBackgroundColor.setFill()
+        NSRect(origin: .zero, size: size).fill()
+        
+        let text = "Screen capture will appear here"
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 16),
+            .foregroundColor: NSColor.secondaryLabelColor
+        ]
+        
+        let textSize = text.size(withAttributes: attributes)
+        let textRect = NSRect(
+            x: (size.width - textSize.width) / 2,
+            y: (size.height - textSize.height) / 2,
+            width: textSize.width,
+            height: textSize.height
+        )
+        
+        text.draw(in: textRect, withAttributes: attributes)
+        image.unlockFocus()
+        
+        return image
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func captureButtonPressed() {
+        Task {
+            await captureScreen()
+        }
+    }
+    
+    private func captureScreen() async {
+        // Update UI to show capturing state
+        DispatchQueue.main.async {
+            if let button = self.mainWindow?.contentView?.subviews.first(where: { $0 is NSButton }) as? NSButton {
+                button.title = "Capturing..."
+                button.isEnabled = false
+            }
+        }
+        
+        // Capture screen using ScreenCaptureManager
+        let startTime = CFAbsoluteTimeGetCurrent()
+        
+        if let capturedImage = await screenCaptureManager.captureCurrentScreen() {
+            let endTime = CFAbsoluteTimeGetCurrent()
+            let captureTime = (endTime - startTime) * 1000 // Convert to milliseconds
+            
+            // Update UI with captured image
+            DispatchQueue.main.async {
+                self.displayCapturedImage(capturedImage, captureTime: captureTime)
+            }
+        } else {
+            // Handle capture failure
+            DispatchQueue.main.async {
+                self.showCaptureError()
+            }
+        }
+        
+        // Reset button state
+        DispatchQueue.main.async {
+            if let button = self.mainWindow?.contentView?.subviews.first(where: { $0 is NSButton }) as? NSButton {
+                button.title = "Capture Screen"
+                button.isEnabled = true
+            }
+        }
+    }
+    
+    private func displayCapturedImage(_ cgImage: CGImage, captureTime: Double) {
+        // Convert CGImage to NSImage
+        let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+        
+        // Update image view
+        imageView?.image = nsImage
+        
+        // Update instructions to show capture time
+        if let instructionsLabel = mainWindow?.contentView?.subviews.last as? NSTextField {
+            instructionsLabel.stringValue = String(format: "✅ Screen captured successfully! Response time: %.1f ms", captureTime)
+            instructionsLabel.textColor = .systemGreen
+        }
+        
+        print("Screen capture completed in \(String(format: "%.1f", captureTime)) ms")
+    }
+    
+    private func showCaptureError() {
+        if let instructionsLabel = mainWindow?.contentView?.subviews.last as? NSTextField {
+            instructionsLabel.stringValue = "❌ Screen capture failed. Check permissions in System Preferences."
+            instructionsLabel.textColor = .systemRed
+        }
+        
+        // Show alert
+        let alert = NSAlert()
+        alert.messageText = "Screen Capture Failed"
+        alert.informativeText = "Unable to capture screen. Please ensure screen recording permission is granted in System Preferences > Privacy & Security > Screen Recording."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Open System Preferences")
+        alert.addButton(withTitle: "OK")
+        
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+        }
     }
     
     // MARK: - Screen Capture Permission
     
     private func checkScreenCapturePermission() {
-        if #available(macOS 12.3, *) {
-            Task {
-                do {
-                    // Request permission for screen capture
-                    let isAuthorized = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
-                    
-                    DispatchQueue.main.async {
-                        if isAuthorized.displays.isEmpty {
-                            self.showPermissionAlert()
-                        } else {
-                            print("Screen capture permission granted")
-                        }
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        self.showPermissionAlert()
-                    }
+        Task {
+            let hasPermission = await screenCaptureManager.requestPermission()
+            
+            DispatchQueue.main.async {
+                self.updatePermissionStatus(hasPermission: hasPermission)
+            }
+            
+            if !hasPermission {
+                DispatchQueue.main.async {
+                    self.showPermissionAlert()
                 }
             }
+        }
+    }
+    
+    private func updatePermissionStatus(hasPermission: Bool) {
+        guard let contentView = mainWindow?.contentView,
+              let permissionLabel = contentView.viewWithTag(0) as? NSTextField ??
+              contentView.subviews.first(where: { $0.identifier?.rawValue == "permissionLabel" }) as? NSTextField else {
+            return
+        }
+        
+        if hasPermission {
+            permissionLabel.stringValue = "Permission Status: ✅ Granted"
+            permissionLabel.textColor = .systemGreen
         } else {
-            // Fallback for older macOS versions
-            showPermissionAlert()
+            permissionLabel.stringValue = "Permission Status: ❌ Not Granted"
+            permissionLabel.textColor = .systemRed
         }
     }
     

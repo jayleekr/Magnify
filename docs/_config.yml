@@ -1,0 +1,100 @@
+# Jekyll 설정
+title: "Magnify Development Blog"
+description: "macOS 화면 주석 도구 개발 여정 - ZoomIt 대안 앱 개발 프로젝트"
+baseurl: "/Magnify"
+url: "https://jayleekr.github.io"
+
+# 작성자 정보
+author:
+  name: "Jay Lee"
+  email: "jay@example.com"
+  github: "jayleekr"
+
+# 사이트 설정
+timezone: Asia/Seoul
+lang: ko
+
+# Jekyll 설정
+markdown: kramdown
+highlighter: rouge
+permalink: /:categories/:year/:month/:day/:title/
+
+# 플러그인
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# 빌드 설정
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+
+# 컬렉션 설정
+collections:
+  milestones:
+    output: true
+    permalink: /:collection/:name/
+
+# 기본값 설정
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Jay Lee"
+  - scope:
+      path: ""
+      type: "milestones"
+    values:
+      layout: "milestone"
+
+# 프로젝트 특화 설정
+project:
+  name: "Magnify"
+  description: "macOS Screen Annotation Tool"
+  version: "1.0.0"
+  github_repo: "https://github.com/jayleekr/Magnify"
+  app_store_url: "#"
+  bundle_id: "com.jayleekr.magnify"
+  start_date: "2025-05-30"
+  
+# 진행상황 (2025년 5월 30일 기준)
+progress:
+  total_milestones: 5
+  total_checkpoints: 20
+  current_milestone: 1
+  current_checkpoint: 1
+  completion_percentage: 5
+
+# 개발 스케줄 (2025년 5월 30일 시작)
+schedule:
+  milestone_1:
+    start: "2025-05-30"
+    end: "2025-06-13"
+    title: "Core Infrastructure"
+  milestone_2:
+    start: "2025-06-14"
+    end: "2025-06-27"
+    title: "Zoom & Annotation Core"
+  milestone_3:
+    start: "2025-06-28"
+    end: "2025-07-11"
+    title: "Advanced Features"
+  milestone_4:
+    start: "2025-07-12"
+    end: "2025-07-25"
+    title: "Polish & Testing"
+  milestone_5:
+    start: "2025-07-26"
+    end: "2025-08-01"
+    title: "App Store Launch" 

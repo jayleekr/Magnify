@@ -6,6 +6,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var mainWindow: NSWindow?
     private let screenCaptureManager = ScreenCaptureManager()
     private var imageView: NSImageView?
+    private var overlayWindow: OverlayWindow?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMainWindow()
@@ -69,6 +70,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         captureButton.action = #selector(captureButtonPressed)
         contentView.addSubview(captureButton)
         
+        // Overlay test buttons
+        let showOverlayButton = NSButton(frame: NSRect(x: 150, y: 330, width: 100, height: 30))
+        showOverlayButton.title = "Show Overlay"
+        showOverlayButton.bezelStyle = .rounded
+        showOverlayButton.target = self
+        showOverlayButton.action = #selector(showOverlayPressed)
+        contentView.addSubview(showOverlayButton)
+        
+        let hideOverlayButton = NSButton(frame: NSRect(x: 260, y: 330, width: 100, height: 30))
+        hideOverlayButton.title = "Hide Overlay"
+        hideOverlayButton.bezelStyle = .rounded
+        hideOverlayButton.target = self
+        hideOverlayButton.action = #selector(hideOverlayPressed)
+        contentView.addSubview(hideOverlayButton)
+        
+        let clearDrawingButton = NSButton(frame: NSRect(x: 370, y: 330, width: 100, height: 30))
+        clearDrawingButton.title = "Clear Drawing"
+        clearDrawingButton.bezelStyle = .rounded
+        clearDrawingButton.target = self
+        clearDrawingButton.action = #selector(clearDrawingPressed)
+        contentView.addSubview(clearDrawingButton)
+        
         // Image view for displaying captured screen
         let imageFrame = NSRect(x: 50, y: 50, width: 500, height: 300)
         imageView = NSImageView(frame: imageFrame)
@@ -86,7 +109,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         // Instructions label
-        let instructionsLabel = NSTextField(labelWithString: "Click 'Capture Screen' to test ScreenCaptureKit functionality")
+        let instructionsLabel = NSTextField(labelWithString: "Test screen capture and transparent overlay window with drawing capabilities")
         instructionsLabel.alignment = .center
         instructionsLabel.font = NSFont.systemFont(ofSize: 12)
         instructionsLabel.frame = NSRect(x: 50, y: 20, width: 500, height: 20)
@@ -248,6 +271,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if response == .alertFirstButtonReturn {
             // Open System Preferences
             NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+        }
+    }
+    
+    // MARK: - Overlay Window Actions
+    
+    @objc private func showOverlayPressed() {
+        if overlayWindow == nil {
+            overlayWindow = OverlayWindow()
+        }
+        overlayWindow?.showOverlay()
+        print("AppDelegate: Overlay window shown for testing")
+    }
+    
+    @objc private func hideOverlayPressed() {
+        overlayWindow?.hideOverlay()
+        print("AppDelegate: Overlay window hidden")
+    }
+    
+    @objc private func clearDrawingPressed() {
+        if let contentView = overlayWindow?.contentView as? OverlayContentView {
+            contentView.clearDrawing()
+            print("AppDelegate: Overlay drawing cleared")
         }
     }
 } 

@@ -1,29 +1,36 @@
 import AppKit
 import Foundation
+import SwiftUI
+import Combine
 
-/// Transparent overlay window for screen-wide annotations
-/// Designed to appear above all other windows and across all Spaces
+/// OverlayWindow provides a transparent, borderless window for screen annotation
+/// Displays on all Spaces and maintains top-most visibility for drawing tools
 class OverlayWindow: NSWindow {
+    
+    var isOverlayVisible = false
+    private let preferencesManager = PreferencesManager.shared
+    private let drawingToolManager = DrawingToolManager.shared
     
     // MARK: - Properties
     
     private var overlayContentView: OverlayContentView!
+    private var toolPaletteHostingView: NSHostingView<ToolPalette>?
     
     // MARK: - Initialization
     
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
-        setupTransparentOverlay()
+        setupWindow()
     }
     
     /// Initialize overlay window with screen bounds
     convenience init() {
-        // Get main screen bounds
-        let screenRect = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1920, height: 1080)
+        // Use full screen bounds for overlay
+        let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1920, height: 1080)
         
         self.init(
-            contentRect: screenRect,
-            styleMask: [.borderless], // Remove window decorations
+            contentRect: screenFrame,
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
@@ -31,82 +38,158 @@ class OverlayWindow: NSWindow {
     
     // MARK: - Setup
     
-    private func setupTransparentOverlay() {
-        // Configure window properties for overlay behavior
-        
-        // Remove window decorations and make borderless
-        self.styleMask = [.borderless]
-        
-        // Make window transparent
+    private func setupWindow() {
+        // Window configuration for transparent overlay
         self.backgroundColor = NSColor.clear
         self.isOpaque = false
-        self.hasShadow = false
-        
-        // Set window level to appear above all other windows
-        self.level = .statusBar // High priority level that stays above most apps
-        
-        // Configure window behavior for all Spaces
-        self.collectionBehavior = [
-            .canJoinAllSpaces,        // Display on all Spaces
-            .stationary,              // Don't move when switching Spaces
-            .ignoresCycle            // Don't appear in Cmd+Tab cycling
-        ]
-        
-        // Enable mouse events
-        self.acceptsMouseMovedEvents = true
         self.ignoresMouseEvents = false
+        self.level = .statusBar
+        self.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
         
         // Create and set content view
-        overlayContentView = OverlayContentView(frame: self.contentRect(forFrameRect: self.frame))
-        overlayContentView.autoresizingMask = [.width, .height]
+        overlayContentView = OverlayContentView(frame: self.frame)
+        overlayContentView.preferencesManager = preferencesManager
+        overlayContentView.drawingToolManager = drawingToolManager
         self.contentView = overlayContentView
         
-        // Configure window behavior
-        self.isReleasedWhenClosed = false // Keep window instance alive
-        self.hidesOnDeactivate = false   // Don't hide when app loses focus
+        // Setup tool palette
+        setupToolPalette()
         
-        print("OverlayWindow: Transparent overlay configured with screen bounds: \(self.frame)")
+        print("OverlayWindow: Initialized with transparent overlay configuration and advanced drawing tools")
     }
+    
+    private func setupToolPalette() {
+        let toolPalette = ToolPalette()
+        toolPaletteHostingView = NSHostingView(rootView: toolPalette)
+        
+        if let hostingView = toolPaletteHostingView {
+            hostingView.frame = NSRect(x: 20, y: 20, width: 280, height: 600)
+            hostingView.isHidden = !drawingToolManager.isToolPaletteVisible
+            overlayContentView.addSubview(hostingView)
+        }
+        
+        // Observe tool palette visibility changes
+        drawingToolManager.$isToolPaletteVisible
+            .sink { [weak self] isVisible in
+                DispatchQueue.main.async {
+                    self?.toolPaletteHostingView?.isHidden = !isVisible
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Public Methods
     
-    /// Show the overlay window on top of all other windows
+    /// Show the overlay window
     func showOverlay() {
-        self.orderFrontRegardless() // Force window to front regardless of app focus
+        // Update to current screen frame in case resolution changed
+        if let screenFrame = NSScreen.main?.frame {
+            self.setFrame(screenFrame, display: true)
+            if let contentView = self.contentView as? OverlayContentView {
+                contentView.frame = screenFrame
+            }
+        }
+        
+        // Apply current preferences
+        if let contentView = self.contentView as? OverlayContentView {
+            contentView.updateFromPreferences()
+        }
+        
+        // Update tool palette visibility
+        toolPaletteHostingView?.isHidden = !drawingToolManager.isToolPaletteVisible
+        
         self.makeKeyAndOrderFront(nil)
-        print("OverlayWindow: Overlay shown")
+        self.isOverlayVisible = true
+        
+        print("OverlayWindow: Overlay shown with advanced drawing tools")
     }
     
     /// Hide the overlay window
     func hideOverlay() {
         self.orderOut(nil)
+        self.isOverlayVisible = false
+        
+        // Hide tool palette when overlay is hidden
+        drawingToolManager.hideToolPalette()
+        
         print("OverlayWindow: Overlay hidden")
     }
     
-    /// Bring overlay to front (useful when window gets buried)
-    func bringToFront() {
-        self.level = .statusBar
-        self.orderFrontRegardless()
-        print("OverlayWindow: Brought to front")
+    /// Toggle overlay visibility
+    func toggleOverlay() {
+        if isOverlayVisible {
+            hideOverlay()
+        } else {
+            showOverlay()
+        }
     }
     
-    /// Check if overlay is currently visible
-    var isOverlayVisible: Bool {
-        return self.isVisible
+    /// Toggle tool palette visibility
+    func toggleToolPalette() {
+        drawingToolManager.toggleToolPalette()
+        print("OverlayWindow: Tool palette toggled")
+    }
+    
+    /// Handle escape key to hide overlay if preference is enabled
+    override func keyDown(with event: NSEvent) {
+        // Handle keyboard shortcuts for drawing tools
+        if event.modifierFlags.contains(.command) {
+            switch event.charactersIgnoringModifiers {
+            case "t": // Cmd+T to toggle tool palette
+                toggleToolPalette()
+                return
+            case "z": // Cmd+Z for undo
+                if event.modifierFlags.contains(.shift) {
+                    drawingToolManager.redo()
+                } else {
+                    drawingToolManager.undo()
+                }
+                return
+            case "c": // Cmd+C to clear all
+                if event.modifierFlags.contains(.shift) {
+                    drawingToolManager.clearAllDrawings()
+                    overlayContentView.needsDisplay = true
+                }
+                return
+            default:
+                break
+            }
+        }
+        
+        // Tool selection shortcuts (1-8 keys)
+        if let chars = event.charactersIgnoringModifiers,
+           let firstChar = chars.first,
+           let number = Int(String(firstChar)),
+           number >= 1 && number <= 8 {
+            let tools = DrawingToolManager.DrawingTool.allCases
+            if number <= tools.count {
+                drawingToolManager.selectTool(tools[number - 1])
+                return
+            }
+        }
+        
+        if preferencesManager.hideOverlayOnEscape && event.keyCode == 53 { // Escape key
+            hideOverlay()
+            return
+        }
+        
+        super.keyDown(with: event)
+    }
+    
+    override var acceptsFirstResponder: Bool {
+        return true
+    }
+    
+    override var canBecomeKey: Bool {
+        return true
     }
     
     // MARK: - Window Event Handling
     
-    override func canBecomeKey() -> Bool {
-        return true // Allow window to become key for event handling
-    }
-    
     override func canBecomeMain() -> Bool {
         return false // Don't become main window to avoid interfering with other apps
-    }
-    
-    override func acceptsFirstResponder() -> Bool {
-        return true // Accept first responder status for keyboard events
     }
     
     // Handle window resizing when screen configuration changes
@@ -120,44 +203,68 @@ class OverlayWindow: NSWindow {
         
         print("OverlayWindow: Frame updated to \(frameRect)")
     }
+    
+    // MARK: - Cleanup
+    
+    deinit {
+        cancellables.removeAll()
+    }
 }
 
 // MARK: - Content View for Drawing
 
-/// Content view for the overlay window that handles drawing and mouse events
+/// OverlayContentView handles the drawing functionality within the overlay window
+/// Provides real-time mouse tracking and advanced drawing capabilities with tool support
 class OverlayContentView: NSView {
     
     // MARK: - Properties
     
-    private var currentDrawingPath: NSBezierPath?
-    private var completedPaths: [NSBezierPath] = []
+    private var currentPath: NSBezierPath?
+    private var allPaths: [(path: NSBezierPath, color: NSColor, width: CGFloat, opacity: Double)] = []
     private var isDrawing = false
     
-    // Drawing properties
-    private var strokeColor: NSColor = .red
-    private var strokeWidth: CGFloat = 3.0
+    // Reference to managers
+    var preferencesManager: PreferencesManager?
+    var drawingToolManager: DrawingToolManager?
+    
+    // Legacy drawing properties (for backward compatibility)
+    private var currentStrokeColor: NSColor = .systemRed
+    private var currentStrokeWidth: CGFloat = 3.0
+    private var currentOpacity: Double = 1.0
     
     // MARK: - Initialization
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setupView()
+        updateFromPreferences()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
+        updateFromPreferences()
     }
     
     private func setupView() {
-        // Enable layer backing for better performance
         self.wantsLayer = true
         self.layer?.backgroundColor = NSColor.clear.cgColor
         
-        // Accept mouse events
-        self.acceptsTouchEvents = true
+        print("OverlayContentView: Initialized with advanced drawing capabilities")
+    }
+    
+    /// Update drawing properties from preferences
+    func updateFromPreferences() {
+        guard let preferences = preferencesManager else { return }
         
-        print("OverlayContentView: Initialized with frame \(self.frame)")
+        currentStrokeColor = preferences.defaultStrokeColor
+        currentStrokeWidth = preferences.defaultStrokeWidth
+        currentOpacity = preferences.defaultOpacity
+        
+        // Redraw with new settings
+        self.needsDisplay = true
+        
+        print("OverlayContentView: Updated from preferences - Color: \(currentStrokeColor), Width: \(currentStrokeWidth), Opacity: \(currentOpacity)")
     }
     
     // MARK: - Drawing
@@ -165,105 +272,205 @@ class OverlayContentView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         
-        // Clear the background (transparent)
-        NSColor.clear.setFill()
-        dirtyRect.fill()
+        // Get current graphics context
+        guard let context = NSGraphicsContext.current?.cgContext else { return }
         
-        // Draw completed paths
-        strokeColor.setStroke()
-        for path in completedPaths {
-            path.lineWidth = strokeWidth
-            path.stroke()
+        // Draw advanced drawing tool elements first
+        if let drawingToolManager = drawingToolManager {
+            drawingToolManager.renderAllElements(in: context)
         }
         
-        // Draw current path being drawn
-        if let currentPath = currentDrawingPath {
-            strokeColor.setStroke()
-            currentPath.lineWidth = strokeWidth
+        // Draw legacy paths for backward compatibility
+        for pathData in allPaths {
+            pathData.color.withAlphaComponent(pathData.opacity).setStroke()
+            pathData.path.lineWidth = pathData.width
+            pathData.path.lineCapStyle = .round
+            pathData.path.lineJoinStyle = .round
+            pathData.path.stroke()
+        }
+        
+        // Draw current path being created (legacy mode)
+        if let currentPath = currentPath, drawingToolManager?.currentTool == .freehand {
+            currentStrokeColor.withAlphaComponent(currentOpacity).setStroke()
+            currentPath.lineWidth = currentStrokeWidth
+            currentPath.lineCapStyle = .round
+            currentPath.lineJoinStyle = .round
             currentPath.stroke()
         }
     }
     
-    // MARK: - Mouse Event Handling
+    // MARK: - Mouse Events
     
     override func mouseDown(with event: NSEvent) {
-        let point = self.convert(event.locationInWindow, from: nil)
+        let locationInView = self.convert(event.locationInWindow, from: nil)
         
-        // Start new drawing path
-        currentDrawingPath = NSBezierPath()
-        currentDrawingPath?.move(to: point)
+        // Check if click is on tool palette
+        if let toolPaletteHostingView = findToolPaletteHostingView(),
+           toolPaletteHostingView.frame.contains(locationInView) {
+            // Let the tool palette handle the event
+            return
+        }
+        
+        // Update cursor for current tool
+        drawingToolManager?.updateCursor()
+        
+        // Use advanced drawing tools if available
+        if let drawingToolManager = drawingToolManager {
+            drawingToolManager.startDrawing(at: locationInView, in: self)
+            self.needsDisplay = true
+            return
+        }
+        
+        // Fallback to legacy drawing
+        updateFromPreferences()
+        currentPath = NSBezierPath()
+        currentPath?.move(to: locationInView)
         isDrawing = true
         
-        print("OverlayContentView: Mouse down at \(point)")
+        print("OverlayContentView: Started drawing at \(locationInView)")
     }
     
     override func mouseDragged(with event: NSEvent) {
-        guard isDrawing, let path = currentDrawingPath else { return }
+        let locationInView = self.convert(event.locationInWindow, from: nil)
         
-        let point = self.convert(event.locationInWindow, from: nil)
-        path.line(to: point)
+        // Use advanced drawing tools if available
+        if let drawingToolManager = drawingToolManager {
+            drawingToolManager.continueDrawing(to: locationInView, in: self)
+            self.needsDisplay = true
+            return
+        }
         
-        // Trigger redraw for the area around the new line segment
-        let redrawRect = NSRect(
-            x: point.x - strokeWidth * 2,
-            y: point.y - strokeWidth * 2,
-            width: strokeWidth * 4,
-            height: strokeWidth * 4
-        )
-        self.setNeedsDisplay(redrawRect)
+        // Fallback to legacy drawing
+        guard isDrawing, let currentPath = currentPath else { return }
         
-        // For real-time drawing, also trigger immediate display
-        self.displayIfNeeded()
+        currentPath.line(to: locationInView)
+        
+        // Optimize redraw to only the area being drawn
+        let invalidRect = currentPath.bounds.insetBy(dx: -currentStrokeWidth - 1, dy: -currentStrokeWidth - 1)
+        self.setNeedsDisplay(invalidRect)
     }
     
     override func mouseUp(with event: NSEvent) {
-        guard isDrawing, let path = currentDrawingPath else { return }
+        let locationInView = self.convert(event.locationInWindow, from: nil)
         
-        // Finish the current path
-        completedPaths.append(path)
-        currentDrawingPath = nil
+        // Use advanced drawing tools if available
+        if let drawingToolManager = drawingToolManager {
+            drawingToolManager.finishDrawing(at: locationInView, in: self)
+            self.needsDisplay = true
+            return
+        }
+        
+        // Fallback to legacy drawing
+        guard isDrawing, let currentPath = currentPath else { return }
+        
+        currentPath.line(to: locationInView)
+        
+        // Store the completed path with current drawing properties
+        allPaths.append((
+            path: currentPath.copy() as! NSBezierPath,
+            color: currentStrokeColor,
+            width: currentStrokeWidth,
+            opacity: currentOpacity
+        ))
+        
+        // Clear current path and stop drawing
+        self.currentPath = nil
         isDrawing = false
         
-        let point = self.convert(event.locationInWindow, from: nil)
-        print("OverlayContentView: Mouse up at \(point), path completed")
-        
-        // Trigger full redraw
+        // Redraw the entire view to ensure everything is displayed correctly
         self.needsDisplay = true
+        
+        print("OverlayContentView: Completed drawing path with \(allPaths.count) total legacy paths")
     }
     
-    // MARK: - Public Methods
+    override func mouseMoved(with event: NSEvent) {
+        // Update cursor based on current tool
+        drawingToolManager?.updateCursor()
+    }
     
-    /// Clear all drawn paths
+    private func findToolPaletteHostingView() -> NSView? {
+        return subviews.first { $0 is NSHostingView<ToolPalette> }
+    }
+    
+    // MARK: - Path Management
+    
+    /// Clear all drawing paths (both legacy and advanced)
     func clearDrawing() {
-        completedPaths.removeAll()
-        currentDrawingPath = nil
+        allPaths.removeAll()
+        currentPath = nil
         isDrawing = false
+        drawingToolManager?.clearAllDrawings()
         self.needsDisplay = true
-        print("OverlayContentView: Drawing cleared")
+        
+        print("OverlayContentView: Cleared all drawing paths")
     }
     
-    /// Set stroke color for drawing
-    func setStrokeColor(_ color: NSColor) {
-        strokeColor = color
+    /// Undo the last drawn path
+    func undoLastPath() {
+        // Try advanced drawing tools first
+        if let drawingToolManager = drawingToolManager, drawingToolManager.canUndo() {
+            drawingToolManager.undo()
+            self.needsDisplay = true
+            return
+        }
+        
+        // Fallback to legacy undo
+        if !allPaths.isEmpty {
+            allPaths.removeLast()
+            self.needsDisplay = true
+            print("OverlayContentView: Undid last legacy path, \(allPaths.count) paths remaining")
+        }
     }
     
-    /// Set stroke width for drawing
-    func setStrokeWidth(_ width: CGFloat) {
-        strokeWidth = width
+    /// Redo the last undone path
+    func redoLastPath() {
+        if let drawingToolManager = drawingToolManager, drawingToolManager.canRedo() {
+            drawingToolManager.redo()
+            self.needsDisplay = true
+        }
     }
     
-    /// Get the number of completed drawing paths
+    /// Get the total number of drawn paths
     var pathCount: Int {
-        return completedPaths.count
+        let advancedCount = drawingToolManager?.elementCount ?? 0
+        return allPaths.count + advancedCount
+    }
+    
+    /// Check if currently drawing
+    var isCurrentlyDrawing: Bool {
+        return isDrawing
     }
     
     // MARK: - View Properties
     
+    override var acceptsFirstResponder: Bool {
+        return true
+    }
+    
     override var isFlipped: Bool {
-        return false // Use standard Cocoa coordinate system
+        return false
     }
     
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         return true // Accept mouse events even when app is not active
+    }
+    
+    // Enable mouse tracking for cursor updates
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        
+        // Remove existing tracking areas
+        for trackingArea in trackingAreas {
+            removeTrackingArea(trackingArea)
+        }
+        
+        // Add new tracking area for the entire view
+        let trackingArea = NSTrackingArea(
+            rect: bounds,
+            options: [.activeInKeyWindow, .mouseMoved],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(trackingArea)
     }
 } 

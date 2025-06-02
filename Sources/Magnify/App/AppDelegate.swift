@@ -12,6 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var zoomWindow: ZoomWindow?
     private var annotationPanelWindow: NSWindow?
     private var recordingControlsWindow: NSWindow?
+    private var recordingControlsPanel: RecordingControlsPanel?
     private let hotkeyManager = HotkeyManager.shared
     private let preferencesManager = PreferencesManager.shared
     private let zoomManager = ZoomManager.shared
@@ -27,17 +28,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var recordingStatusLabel: NSTextField?
     private var statusUpdateTimer: Timer?
     
+    // Recording Manager
+    private var recordingManager: ScreenRecordingManager?
+    
+    // Timer System
+    private var timerManager = PresentationTimerManager.shared
+    private var timerOverlayWindow: TimerOverlayWindow?
+    private var timerControlsWindow: NSWindow?
+    private var timerControlsPanel: TimerControlsPanel?
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
-        setupMainWindow()
-        checkScreenCapturePermission()
-        setupGlobalHotkeys()
-        setupPreferences()
-        setupZoomFunctionality()
-        setupDrawingTools()
-        setupAnnotationManagement()
-        setupScreenRecording()
-        setupMenuBar()
-        startStatusUpdates()
+        initializeComponents()
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -863,46 +864,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Global Hotkeys
     
     private func setupGlobalHotkeys() {
-        // Set up hotkey handler for overlay and zoom toggle
-        hotkeyManager.setHotkeyHandler { [weak self] descriptor in
-            switch descriptor.identifier {
-            case "overlay_toggle":
-                self?.toggleOverlay()
-            case "zoom_toggle":
-                self?.toggleZoom()
-            default:
-                print("AppDelegate: Unknown hotkey pressed: \(descriptor.identifier)")
-            }
+        // Existing hotkeys
+        hotkeyManager.registerHotkey(key: .m, modifiers: [.command, .shift]) { [weak self] in
+            self?.toggleOverlay()
         }
         
-        // Register hotkey if enabled in preferences
-        if preferencesManager.globalHotkeyEnabled {
-            let overlaySuccess = hotkeyManager.registerDefaultOverlayToggle()
-            if overlaySuccess {
-                print("AppDelegate: Successfully registered global hotkey ⌘⇧M for overlay toggle")
-            } else {
-                print("AppDelegate: Failed to register overlay hotkey")
-            }
-            
-            // Register zoom hotkey (Cmd+Shift+Z)
-            let zoomSuccess = hotkeyManager.registerHotkey(
-                key: "z",
-                modifiers: ["cmd", "shift"],
-                identifier: "zoom_toggle"
-            )
-            if zoomSuccess {
-                print("AppDelegate: Successfully registered global hotkey ⌘⇧Z for zoom toggle")
-            } else {
-                print("AppDelegate: Failed to register zoom hotkey")
-                
-                // Show alert to user about hotkey registration failure
-                DispatchQueue.main.async {
-                    self.showHotkeyRegistrationAlert()
-                }
-            }
-        } else {
-            print("AppDelegate: Global hotkeys disabled in preferences")
+        hotkeyManager.registerHotkey(key: .z, modifiers: [.command, .shift]) { [weak self] in
+            self?.toggleZoom()
         }
+        
+        hotkeyManager.registerHotkey(key: .t, modifiers: [.command, .shift]) { [weak self] in
+            self?.showTimerControls()
+        }
+        
+        hotkeyManager.registerHotkey(key: .r, modifiers: [.command, .shift]) { [weak self] in
+            self?.showRecordingControls()
+        }
+        
+        // Timer-specific hotkeys
+        hotkeyManager.registerHotkey(key: .p, modifiers: [.command, .shift, .option]) { [weak self] in
+            self?.pauseResumeTimer()
+        }
+        
+        hotkeyManager.registerHotkey(key: .s, modifiers: [.command, .shift, .option]) { [weak self] in
+            self?.stopTimer()
+        }
+        
+        hotkeyManager.registerHotkey(key: .o, modifiers: [.command, .shift]) { [weak self] in
+            self?.toggleTimerOverlay()
+        }
+        
+        print("AppDelegate: Global hotkeys registered including timer controls")
     }
     
     private func toggleOverlay() {
@@ -992,56 +984,95 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("AppDelegate: Drawing tools initialized")
     }
     
-    private func setupMenuBar() {
-        // Create drawing tools menu
-        let mainMenu = NSApplication.shared.mainMenu
+    @objc func setupMenuBar() {
+        let mainMenu = NSMenu()
         
-        // Find or create Tools menu
-        var toolsMenu: NSMenu
-        if let existingToolsMenu = mainMenu?.items.first(where: { $0.title == "Tools" })?.submenu {
-            toolsMenu = existingToolsMenu
-        } else {
-            let toolsMenuItem = NSMenuItem(title: "Tools", action: nil, keyEquivalent: "")
-            toolsMenu = NSMenu(title: "Tools")
-            toolsMenuItem.submenu = toolsMenu
-            
-            // Insert Tools menu before Window menu
-            if let windowMenuIndex = mainMenu?.items.firstIndex(where: { $0.title == "Window" }) {
-                mainMenu?.insertItem(toolsMenuItem, at: windowMenuIndex)
-            } else {
-                mainMenu?.addItem(toolsMenuItem)
-            }
+        // App Menu
+        let appMenuItem = NSMenuItem()
+        appMenuItem.submenu = createAppMenu()
+        mainMenu.addItem(appMenuItem)
+        
+        // File Menu
+        let fileMenuItem = NSMenuItem(title: "File", action: nil, keyEquivalent: "")
+        fileMenuItem.submenu = createFileMenu()
+        mainMenu.addItem(fileMenuItem)
+        
+        // Tools Menu
+        let toolsMenuItem = NSMenuItem(title: "Tools", action: nil, keyEquivalent: "")
+        toolsMenuItem.submenu = createToolsMenu()
+        mainMenu.addItem(toolsMenuItem)
+        
+        // Timer Menu
+        let timerMenuItem = NSMenuItem(title: "Timer", action: nil, keyEquivalent: "")
+        timerMenuItem.submenu = createTimerMenu()
+        mainMenu.addItem(timerMenuItem)
+        
+        // View Menu
+        let viewMenuItem = NSMenuItem(title: "View", action: nil, keyEquivalent: "")
+        viewMenuItem.submenu = createViewMenu()
+        mainMenu.addItem(viewMenuItem)
+        
+        // Recording Menu
+        let recordingMenuItem = NSMenuItem(title: "Recording", action: nil, keyEquivalent: "")
+        recordingMenuItem.submenu = createRecordingMenu()
+        mainMenu.addItem(recordingMenuItem)
+        
+        NSApp.mainMenu = mainMenu
+        print("AppDelegate: Menu bar setup completed with Timer menu")
+    }
+    
+    private func createTimerMenu() -> NSMenu {
+        let menu = NSMenu(title: "Timer")
+        
+        // Timer Controls
+        menu.addItem(NSMenuItem(title: "Show Timer Controls", action: #selector(showTimerControls), keyEquivalent: "t"))
+        menu.addItem(NSMenuItem.separator())
+        
+        // Quick Start Timers
+        let quickStartItem = NSMenuItem(title: "Quick Start", action: nil, keyEquivalent: "")
+        let quickStartMenu = NSMenu(title: "Quick Start")
+        
+        // Add quick timer options
+        let quickTimers: [(String, TimeInterval, String)] = [
+            ("5 Minutes", 5 * 60, "5"),
+            ("15 Minutes", 15 * 60, ""),
+            ("25 Minutes (Pomodoro)", 25 * 60, ""),
+            ("45 Minutes", 45 * 60, ""),
+            ("1 Hour", 60 * 60, "")
+        ]
+        
+        for (title, duration, keyEquivalent) in quickTimers {
+            let item = NSMenuItem(title: title, action: #selector(startQuickTimer(_:)), keyEquivalent: keyEquivalent)
+            item.representedObject = duration
+            quickStartMenu.addItem(item)
         }
         
-        // Add drawing tool items
-        toolsMenu.addItem(NSMenuItem.separator())
+        quickStartItem.submenu = quickStartMenu
+        menu.addItem(quickStartItem)
         
-        let toolPaletteItem = NSMenuItem(title: "Toggle Tool Palette", action: #selector(toggleToolPaletteFromMenu), keyEquivalent: "t")
-        toolPaletteItem.keyEquivalentModifierMask = [.command]
-        toolPaletteItem.target = self
-        toolsMenu.addItem(toolPaletteItem)
+        menu.addItem(NSMenuItem.separator())
         
-        let clearDrawingItem = NSMenuItem(title: "Clear All Drawings", action: #selector(clearAllDrawingsFromMenu), keyEquivalent: "")
-        clearDrawingItem.target = self
-        toolsMenu.addItem(clearDrawingItem)
+        // Timer Actions
+        let pauseResumeItem = NSMenuItem(title: "Pause/Resume Timer", action: #selector(pauseResumeTimer), keyEquivalent: "p")
+        pauseResumeItem.keyEquivalentModifierMask = [.command, .shift]
+        menu.addItem(pauseResumeItem)
         
-        toolsMenu.addItem(NSMenuItem.separator())
+        let stopTimerItem = NSMenuItem(title: "Stop Timer", action: #selector(stopTimer), keyEquivalent: "")
+        menu.addItem(stopTimerItem)
         
-        // Add tool selection submenu
-        let toolSelectionItem = NSMenuItem(title: "Select Tool", action: nil, keyEquivalent: "")
-        let toolSelectionMenu = NSMenu(title: "Select Tool")
-        toolSelectionItem.submenu = toolSelectionMenu
+        let addTimeItem = NSMenuItem(title: "Add 5 Minutes", action: #selector(addTimerTime), keyEquivalent: "")
+        menu.addItem(addTimeItem)
         
-        for (index, tool) in DrawingToolManager.DrawingTool.allCases.enumerated() {
-            let toolItem = NSMenuItem(title: tool.displayName, action: #selector(selectToolFromMenu(_:)), keyEquivalent: "\(index + 1)")
-            toolItem.target = self
-            toolItem.tag = index
-            toolSelectionMenu.addItem(toolItem)
-        }
+        menu.addItem(NSMenuItem.separator())
         
-        toolsMenu.addItem(toolSelectionItem)
+        // Timer Display
+        let showOverlayItem = NSMenuItem(title: "Show Timer Overlay", action: #selector(toggleTimerOverlay), keyEquivalent: "")
+        menu.addItem(showOverlayItem)
         
-        print("AppDelegate: Drawing tools menu setup completed")
+        let timerHistoryItem = NSMenuItem(title: "Timer History", action: #selector(showTimerHistory), keyEquivalent: "")
+        menu.addItem(timerHistoryItem)
+        
+        return menu
     }
     
     @objc private func toggleToolPalettePressed() {
@@ -1050,10 +1081,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         overlayWindow?.toggleToolPalette()
         print("AppDelegate: Tool palette toggled")
-    }
-    
-    @objc private func toggleToolPaletteFromMenu() {
-        toggleToolPalettePressed()
     }
     
     @objc private func testDrawingPressed() {
@@ -1092,5 +1119,186 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         drawingToolManager.clearAllDrawings()
         overlayWindow?.contentView?.needsDisplay = true
         print("AppDelegate: All drawings cleared from menu")
+    }
+    
+    // MARK: - Timer Integration
+    
+    private func setupTimerIntegration() {
+        // Observe timer state changes for menu updates
+        timerManager.$isTimerActive
+            .sink { [weak self] isActive in
+                DispatchQueue.main.async {
+                    self?.updateTimerMenuItems()
+                    if !isActive {
+                        self?.timerOverlayWindow?.hideOverlay()
+                    }
+                }
+            }
+            .store(in: &cancellables)
+        
+        print("AppDelegate: Timer integration setup completed")
+    }
+    
+    private func updateTimerMenuItems() {
+        // Update menu item states based on timer status
+        guard let timerMenu = NSApp.mainMenu?.item(withTitle: "Timer")?.submenu else { return }
+        
+        // Update pause/resume item text
+        if let pauseResumeItem = timerMenu.item(withTitle: "Pause/Resume Timer") {
+            if timerManager.isTimerActive {
+                pauseResumeItem.title = timerManager.isPaused ? "Resume Timer" : "Pause Timer"
+                pauseResumeItem.isEnabled = true
+            } else {
+                pauseResumeItem.title = "Pause/Resume Timer"
+                pauseResumeItem.isEnabled = false
+            }
+        }
+        
+        // Update stop timer item
+        if let stopItem = timerMenu.item(withTitle: "Stop Timer") {
+            stopItem.isEnabled = timerManager.isTimerActive
+        }
+        
+        // Update add time item
+        if let addTimeItem = timerMenu.item(withTitle: "Add 5 Minutes") {
+            addTimeItem.isEnabled = timerManager.isTimerActive
+        }
+        
+        // Update overlay item
+        if let overlayItem = timerMenu.item(withTitle: "Show Timer Overlay") {
+            if timerManager.isTimerActive {
+                overlayItem.title = timerOverlayWindow?.isVisible == true ? "Hide Timer Overlay" : "Show Timer Overlay"
+            } else {
+                overlayItem.title = "Show Timer Overlay"
+                overlayItem.isEnabled = false
+            }
+        }
+    }
+    
+    // MARK: - Timer Action Methods
+    
+    @objc func showTimerControls() {
+        if timerControlsWindow == nil {
+            timerControlsPanel = TimerControlsPanel()
+            
+            let hostingView = NSHostingView(rootView: timerControlsPanel!)
+            timerControlsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 600),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered,
+                defer: false
+            )
+            timerControlsWindow?.contentView = hostingView
+            timerControlsWindow?.title = "Timer Controls"
+            timerControlsWindow?.center()
+            timerControlsWindow?.setFrameAutosaveName("TimerControlsWindow")
+        }
+        
+        timerControlsWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        
+        print("AppDelegate: Timer controls window shown")
+    }
+    
+    @objc func startQuickTimer(_ sender: NSMenuItem) {
+        guard let duration = sender.representedObject as? TimeInterval else { return }
+        
+        timerManager.startTimer(
+            duration: duration,
+            mode: .countdown,
+            type: .presentation
+        )
+        
+        print("AppDelegate: Quick timer started for \(duration) seconds")
+    }
+    
+    @objc func pauseResumeTimer() {
+        if timerManager.isPaused {
+            timerManager.resumeTimer()
+            print("AppDelegate: Timer resumed")
+        } else if timerManager.isTimerActive {
+            timerManager.pauseTimer()
+            print("AppDelegate: Timer paused")
+        }
+    }
+    
+    @objc func stopTimer() {
+        timerManager.stopTimer()
+        print("AppDelegate: Timer stopped")
+    }
+    
+    @objc func addTimerTime() {
+        timerManager.addTime(5 * 60) // Add 5 minutes
+        print("AppDelegate: Added 5 minutes to timer")
+    }
+    
+    @objc func toggleTimerOverlay() {
+        guard let overlayWindow = timerOverlayWindow else { return }
+        
+        if timerManager.isTimerActive {
+            overlayWindow.toggleOverlay()
+            print("AppDelegate: Timer overlay toggled")
+        } else {
+            // Show timer controls if no active timer
+            showTimerControls()
+        }
+    }
+    
+    @objc func showTimerHistory() {
+        // Show timer history as a sheet on timer controls window
+        if timerControlsWindow == nil {
+            showTimerControls()
+        }
+        
+        // The history will be shown via the TimerControlsPanel interface
+        print("AppDelegate: Timer history accessed")
+    }
+    
+    @objc func initializeComponents() {
+        print("AppDelegate: Initializing all components...")
+        
+        // Initialize managers
+        initializeManagers()
+        
+        // Initialize UI components
+        initializeWindows()
+        
+        // Setup hotkeys
+        setupGlobalHotkeys()
+        
+        print("AppDelegate: All components initialized successfully")
+    }
+    
+    private func initializeManagers() {
+        // Screen capture manager
+        screenCaptureManager = ScreenCaptureManager()
+        
+        // Recording manager
+        recordingManager = ScreenRecordingManager()
+        
+        // Timer system is already initialized as shared instance
+        setupTimerIntegration()
+        
+        print("AppDelegate: Managers initialized")
+    }
+    
+    private func initializeWindows() {
+        // Overlay window
+        overlayWindow = OverlayWindow()
+        
+        // Zoom window
+        zoomWindow = ZoomWindow()
+        
+        // Preferences window controller
+        preferencesWindowController = PreferencesWindowController()
+        
+        // Timer overlay window
+        timerOverlayWindow = TimerOverlayWindow()
+        
+        print("AppDelegate: Windows initialized")
+    }
+    
+    @objc private func toggleToolPaletteFromMenu() {
+        toggleToolPalettePressed()
     }
 } 

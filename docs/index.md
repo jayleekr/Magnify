@@ -52,11 +52,11 @@ description: "Development journey of a macOS native screen annotation tool that 
         <div class="milestone">
             <h3>✨ Milestone 3: Advanced Features (Week 5-6)</h3>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: 33%"></div>
+                <div class="progress-fill" style="width: 67%"></div>
             </div>
             <ul class="checkpoint-list">
                 <li class="completed">✅ Checkpoint 3.1: Screen recording system with annotation overlay</li>
-                <li class="in-progress">🚧 Checkpoint 3.2: Break timer and presentation tools (IN PROGRESS)</li>
+                <li class="completed">✅ Checkpoint 3.2: Break timer and presentation tools (COMPLETED)</li>
                 <li class="pending">⏳ Checkpoint 3.3: Advanced annotation features and templates</li>
             </ul>
         </div>
